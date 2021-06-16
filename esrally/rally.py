@@ -33,6 +33,8 @@ from esrally.mechanic import team, mechanic
 from esrally.tracker import tracker
 from esrally.utils import io, convert, process, console, net, opts, versions
 
+import boto3
+from codeguru_profiler_agent import Profiler
 
 def create_arg_parser():
     def positive_number(v):
@@ -949,4 +951,7 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.getLogger('codeguru_profiler_agent').setLevel(logging.DEBUG)
+    custom_session = boto3.session.Session(region_name='eu-west-1')
+    Profiler(profiling_group_name="TestOpenSearchBenchmark", aws_session=custom_session).start()
     main()

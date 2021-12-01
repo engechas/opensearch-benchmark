@@ -45,18 +45,32 @@ class RequestContextManager:
         self.token = None
 
     async def __aenter__(self):
+        print(">>>>>> inside __aenter__")
+        print(">>>>> initi self.ctx")
+        print(self.ctx)
         self.ctx, self.token = self.ctx_holder.init_request_context()
+        print(">>>>> after aenter completed - self.ctx")
+        print(self.ctx)
         return self
 
     @property
     def request_start(self):
+        print(">>>>>> inside request_start")
+        print(">>>>>>>>>>>self.ctx")
+        print(self.ctx)
         return self.ctx["request_start"]
 
     @property
     def request_end(self):
+        print(">>>>>> inside request_end")
+        print(">>>>>>>>>>>self.ctx")
+        print(self.ctx)
         return self.ctx["request_end"]
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
+        print(">>>>>>>>>>> Inside __-aexit____")
+        print(">>>>>>>>>>>.self.ctx")
+        print(self.ctx)
         # propagate earliest request start and most recent request end to parent
         request_start = self.request_start
         request_end = self.request_end
@@ -102,10 +116,12 @@ class RequestContextHolder:
 
     @classmethod
     def on_request_start(cls):
+        print(">>>>>>>>>on_request_start invoked ")
         cls.update_request_start(time.perf_counter())
 
     @classmethod
     def on_request_end(cls):
+        print(">>>>>>>>> on_request_end invoked")
         cls.update_request_end(time.perf_counter())
 
     @classmethod
@@ -239,9 +255,19 @@ class OsClientFactory:
                     return super().loads(s)
 
         async def on_request_start(session, trace_config_ctx, params):
+            print(">>>>>>> on_request_start >>>>> invoked inside create_async!")
+            print("session / trace_config_ctx/ params")
+            print(session)
+            print(trace_config_ctx)
+            print(params)
             BenchmarkAsyncOpenSearch.on_request_start()
 
         async def on_request_end(session, trace_config_ctx, params):
+            print(">>>>>>> on_request_end >>>>> invoked inside create_async!")
+            print("session / trace_config_ctx/ params")
+            print(session)
+            print(trace_config_ctx)
+            print(params)
             BenchmarkAsyncOpenSearch.on_request_end()
 
         trace_config = aiohttp.TraceConfig()
@@ -254,11 +280,26 @@ class OsClientFactory:
         self.client_options["serializer"] = LazyJSONSerializer()
         self.client_options["trace_config"] = trace_config
 
+        class TraceConfigWrapper(osbenchmark.async_connection.AIOHttpConnection):
+            async def perform_request(
+                self, method, url, params=None, body=None, timeout=None, ignore=(), headers=None
+            ):
+                try:
+                    print("Inside TraceConfigWrapper class")
+                    BenchmarkAsyncOpenSearch.on_request_start()
+                    print("Invoking request")
+                    await super().perform_request(method, url, params, body, timeout, ignore, headers)
+                    print("Request invokation complete")
+                finally:
+                    BenchmarkAsyncOpenSearch.on_request_end()
+                    print("Ctx update complete")
+
+
         class BenchmarkAsyncOpenSearch(elasticsearch.AsyncElasticsearch, RequestContextHolder):
             pass
 
         return BenchmarkAsyncOpenSearch(hosts=self.hosts,
-                                       connection_class=osbenchmark.async_connection.AIOHttpConnection,
+                                       connection_class=TraceConfigWrapper,
                                        ssl_context=self.ssl_context,
                                        **self.client_options)
 

@@ -1731,6 +1731,12 @@ class GlobalStatsCalculator:
         unit = self.store.get_unit(metric_name)
         if values:
             flat_values = [w for v in values for w in v]
+            print(">>>>>>>>>>>>>metric_name")
+            print(metric_name)
+            print(">>>>>>>>>>>>>flat_values")
+            print(flat_values)
+            if not flat_values:
+                flat_values = [-101]
             return {
                 "min": min(flat_values),
                 "median": statistics.median(flat_values),

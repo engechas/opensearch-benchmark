@@ -288,8 +288,9 @@ class OsClientFactory:
                     print("Inside TraceConfigWrapper class")
                     BenchmarkAsyncOpenSearch.on_request_start()
                     print("Invoking request")
-                    await super().perform_request(method, url, params, body, timeout, ignore, headers)
+                    status_code, headers, raw_data = await super().perform_request(method, url, params, body, timeout, ignore, headers)
                     print("Request invokation complete")
+                    return status_code, headers, raw_data
                 finally:
                     BenchmarkAsyncOpenSearch.on_request_end()
                     print("Ctx update complete")

@@ -1149,39 +1149,19 @@ class DeleteIndex(Runner):
     async def __call__(self, opensearch, params):
         ops = 0
 
-        print(">>>>>>>>>>Enter Delete territory!!!")
         indices = mandatory(params, "indices", self)
-        print(">>>>>>>>>>Indices are : ")
-        print(indices)
-        print(">>>>>>params")
-        print(params)
         only_if_exists = params.get("only-if-exists", False)
         request_params = params.get("request-params", {})
-        print("?>>>>>>>request_params")
-        print(request_params)
+
         for index_name in indices:
             if not only_if_exists:
-                print(">>>>>> Delete call ")
-                print(">>>>>>>>>>>>index_name")
-                print(index_name)
-                print(">>>>>>>>>request_params")
-                print(request_params)
                 await opensearch.indices.delete(index=index_name, params=request_params)
                 ops += 1
-            elif only_if_exists:
-                print("Only if exists :) ")
-                # index_exists = await opensearch.indices.exists(index=index_name)
-                index_exists = False
-                if index_exists:
-                    print("Index already exists, deleteing it!")
-                    print(index_name)
-                    self.logger.info("Index [%s] already exists. Deleting it.", index_name)
-                    await opensearch.indices.delete(index=index_name, params=request_params)
-                    ops += 1
-                else:
-                    print("Index doesn't exist!")
+            elif only_if_exists and await opensearch.indices.exists(index=index_name):
+                self.logger.info("Index [%s] already exists. Deleting it.", index_name)
+                await opensearch.indices.delete(index=index_name, params=request_params)
+                ops += 1
 
-            print("Existing the loop iteration for delete index operation!!!")
         return {
             "weight": ops,
             "unit": "ops",

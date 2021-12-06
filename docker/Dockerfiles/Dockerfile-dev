@@ -10,13 +10,13 @@ RUN apt-get -y update && \
     apt-get -y upgrade && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /benchmark/osbenchmark
+RUN mkdir -p /benchmark/opensearch-benchmark
 COPY setup.py /benchmark/
 COPY setup.cfg /benchmark/
 COPY version.txt /benchmark/
 COPY README.md /benchmark/
 COPY MANIFEST.in /benchmark/
-COPY osbenchmark/ /benchmark/osbenchmark/
+COPY opensearch-benchmark/ /benchmark/opensearch-benchmark/
 
 RUN python3 -m venv /benchmark/venv
 ENV PATH="/benchmark/venv/bin:$PATH"

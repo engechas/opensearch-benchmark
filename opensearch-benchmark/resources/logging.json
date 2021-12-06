@@ -4,12 +4,12 @@
     "normal": {
       "format": "%(asctime)s,%(msecs)d %(actorAddress)s/PID:%(process)d %(name)s %(levelname)s %(message)s",
       "datefmt": "%Y-%m-%d %H:%M:%S",
-      "()": "osbenchmark.log.configure_utc_formatter"
+      "()": "opensearch_benchmark.log.configure_utc_formatter"
     },
     "profile": {
       "format": "%(asctime)s,%(msecs)d PID:%(process)d %(name)s %(levelname)s %(message)s",
       "datefmt": "%Y-%m-%d %H:%M:%S",
-      "()": "osbenchmark.log.configure_utc_formatter"
+      "()": "opensearch_benchmark.log.configure_utc_formatter"
     }
   },
   "filters": {

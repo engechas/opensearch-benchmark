@@ -16,7 +16,7 @@ For more details please refer to the [PyEnv installation instructions](https://g
 Use the following command-line instructions to setup OpenSearch Benchmark for development:
 ```
 git clone https://github.com/opensearch-project/OpenSearch-Benchmark.git
-cd OpenSearch-Benchmark
+cd opensearch-benchmark
 make prereq
 make install
 ```

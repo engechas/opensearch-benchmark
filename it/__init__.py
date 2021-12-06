@@ -32,8 +32,8 @@ import time
 
 import pytest
 
-from osbenchmark import client, config, version
-from osbenchmark.utils import process
+from opensearch_benchmark import client, config, version
+from opensearch_benchmark.utils import process
 
 CONFIG_NAMES = ["in-memory-it", "os-it"]
 DISTRIBUTIONS = ["1.0.0", "1.0.1"]
@@ -77,16 +77,16 @@ def benchmark_os(t):
     return wrapper
 
 
-def osbenchmark_command_line_for(cfg, command_line):
-    return f"osbenchmark {command_line} --configuration-name='{cfg}'"
+def opensearch_benchmark_command_line_for(cfg, command_line):
+    return f"opensearch_benchmark {command_line} --configuration-name='{cfg}'"
 
 
-def osbenchmark(cfg, command_line):
+def opensearch_benchmark(cfg, command_line):
     """
     This method should be used for benchmark invocations of the all commands besides test_execution.
     These commands may have different CLI options than test_execution.
     """
-    return os.system(osbenchmark_command_line_for(cfg, command_line))
+    return os.system(opensearch_benchmark_command_line_for(cfg, command_line))
 
 
 def execute_test(cfg, command_line):
@@ -94,7 +94,7 @@ def execute_test(cfg, command_line):
     This method should be used for benchmark invocations of the test_execution command.
     It sets up some defaults for how the integration tests expect to run test_executions.
     """
-    return osbenchmark(cfg, f"execute_test {command_line} --kill-running-processes --on-error='abort' --enable-assertions")
+    return opensearch_benchmark(cfg, f"execute_test {command_line} --kill-running-processes --on-error='abort' --enable-assertions")
 
 
 def shell_cmd(command_line):
@@ -164,7 +164,7 @@ class TestCluster:
         transport_port = http_port + 100
         try:
             output = process.run_subprocess_with_output(
-                "osbenchmark install --configuration-name={cfg} --quiet --distribution-version={dist} --build-type=tar "
+                "opensearch-benchmark install --configuration-name={cfg} --quiet --distribution-version={dist} --build-type=tar "
                 "--http-port={http_port} --node={node_name} --master-nodes="
                 "{node_name} --provision-config-instance={provision_config_instance} "
                 "--seed-hosts=\"127.0.0.1:{transport_port}\"".format(cfg=self.cfg,
@@ -179,14 +179,14 @@ class TestCluster:
 
     def start(self, test_execution_id):
         cmd = "start --runtime-jdk=\"bundled\" --installation-id={} --test-execution-id={}".format(self.installation_id, test_execution_id)
-        if osbenchmark(self.cfg, cmd) != 0:
+        if opensearch_benchmark(self.cfg, cmd) != 0:
             raise AssertionError("Failed to start OpenSearch test cluster.")
         opensearch = client.OsClientFactory(hosts=[{"host": "127.0.0.1", "port": self.http_port}], client_options={}).create()
         client.wait_for_rest_layer(opensearch)
 
     def stop(self):
         if self.installation_id:
-            if osbenchmark(self.cfg, "stop --installation-id={}".format(self.installation_id)) != 0:
+            if opensearch_benchmark(self.cfg, "stop --installation-id={}".format(self.installation_id)) != 0:
                 raise AssertionError("Failed to stop OpenSearch test cluster.")
 
     def __str__(self):

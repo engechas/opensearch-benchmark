@@ -25,7 +25,7 @@
 import json
 from unittest import TestCase
 
-from osbenchmark.async_connection import ResponseMatcher
+from opensearch_benchmark.async_connection import ResponseMatcher
 
 
 class ResponseMatcherTests(TestCase):

@@ -26,9 +26,9 @@
 import random
 from unittest import TestCase
 
-from osbenchmark import exceptions
-from osbenchmark.workload import params, workload
-from osbenchmark.utils import io
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.workload import params, workload
+from opensearch_benchmark.utils import io
 
 
 class StaticBulkReader:

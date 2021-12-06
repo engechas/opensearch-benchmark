@@ -66,7 +66,7 @@ install: install-user
 clean: nondocs-clean docs-clean
 
 nondocs-clean:
-	rm -rf .benchmarks .eggs .tox .benchmark_it .cache build dist osbenchmark.egg-info logs junit-py*.xml NOTICE.txt
+	rm -rf .benchmarks .eggs .tox .benchmark_it .cache build dist opensearch-benchmark.egg-info logs junit-py*.xml NOTICE.txt
 
 docs-clean:
 	cd docs && $(MAKE) clean
@@ -78,7 +78,7 @@ python-caches-clean:
 
 # Force recreation of the virtual environment used by tox.
 #
-# See https://github.com/opensearch-project/OpenSearch-Benchmark/blob/main/DEVELOPER_GUIDE.md:
+# See https://github.com/opensearch-project/opensearch-benchmark/blob/main/DEVELOPER_GUIDE.md:
 #
 # > Note pip will not update project dependencies (specified either in the install_requires or the extras
 # > section of the setup.py) if any version already exists in the virtual environment; therefore we recommend
@@ -87,7 +87,7 @@ tox-env-clean:
 	rm -rf .tox
 
 lint: check-venv
-	@find osbenchmark benchmarks scripts tests it -name "*.py" -exec $(VEPYLINT) -j0 -rn --load-plugins pylint_quotes --rcfile=$(CURDIR)/.pylintrc \{\} +
+	@find opensearch-benchmark benchmarks scripts tests it -name "*.py" -exec $(VEPYLINT) -j0 -rn --load-plugins pylint_quotes --rcfile=$(CURDIR)/.pylintrc \{\} +
 
 docs: check-venv
 	@. $(VENV_ACTIVATE_FILE); cd docs && $(MAKE) html

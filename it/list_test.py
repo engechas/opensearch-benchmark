@@ -27,27 +27,27 @@ import it
 
 @it.all_benchmark_configs
 def test_list_test_executions(cfg):
-    assert it.osbenchmark(cfg, "list test_executions") == 0
+    assert it.opensearch_benchmark(cfg, "list test_executions") == 0
 
 
 @it.benchmark_in_mem
 def test_list_provision_config_instances(cfg):
-    assert it.osbenchmark(cfg, "list provision_config_instances") == 0
-    assert it.osbenchmark(cfg, "list provision_config_instances --provision-config-repository=default") == 0
+    assert it.opensearch_benchmark(cfg, "list provision_config_instances") == 0
+    assert it.opensearch_benchmark(cfg, "list provision_config_instances --provision-config-repository=default") == 0
 
 
 @it.benchmark_in_mem
 def test_list_opensearch_plugins(cfg):
-    assert it.osbenchmark(cfg, "list opensearch-plugins") == 0
+    assert it.opensearch_benchmark(cfg, "list opensearch-plugins") == 0
 
 
 @it.benchmark_in_mem
 def test_list_workloads(cfg):
-    assert it.osbenchmark(cfg, "list workloads") == 0
-    assert it.osbenchmark(cfg, "list workloads --workload-repository=default "
+    assert it.opensearch_benchmark(cfg, "list workloads") == 0
+    assert it.opensearch_benchmark(cfg, "list workloads --workload-repository=default "
                            "--workload-revision=000f2af53b9c34a2e83277e936dac113d497a80f") == 0
 
 
 @it.benchmark_in_mem
 def test_list_telemetry(cfg):
-    assert it.osbenchmark(cfg, "list telemetry") == 0
+    assert it.opensearch_benchmark(cfg, "list telemetry") == 0

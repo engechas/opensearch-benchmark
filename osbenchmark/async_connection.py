@@ -19,7 +19,7 @@ from aiohttp.helpers import BaseTimerContext
 from multidict import CIMultiDictProxy, CIMultiDict
 from yarl import URL
 
-from osbenchmark.utils import io
+from opensearch_benchmark.utils import io
 
 
 class StaticTransport:

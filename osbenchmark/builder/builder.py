@@ -33,9 +33,9 @@ from collections import defaultdict
 
 import thespian.actors
 
-from osbenchmark import actor, client, paths, config, metrics, exceptions, PROGRAM_NAME
-from osbenchmark.builder import supplier, provisioner, launcher, provision_config
-from osbenchmark.utils import net, console
+from opensearch_benchmark import actor, client, paths, config, metrics, exceptions, PROGRAM_NAME
+from opensearch_benchmark.builder import supplier, provisioner, launcher, provision_config
+from opensearch_benchmark.utils import net, console
 
 METRIC_FLUSH_INTERVAL_SECONDS = 30
 

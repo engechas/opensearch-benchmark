@@ -25,7 +25,7 @@ import json
 from unittest import mock
 from unittest.mock import call
 
-from osbenchmark.tracker import corpus
+from opensearch_benchmark.tracker import corpus
 
 
 def serialize_doc(doc):

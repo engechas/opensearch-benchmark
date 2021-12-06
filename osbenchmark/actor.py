@@ -28,8 +28,8 @@ import socket
 import thespian.actors
 import thespian.system.messages.status
 
-from osbenchmark import exceptions, log
-from osbenchmark.utils import console, net
+from opensearch_benchmark import exceptions, log
+from opensearch_benchmark.utils import console, net
 
 
 class BenchmarkFailure:

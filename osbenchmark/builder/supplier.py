@@ -31,9 +31,9 @@ import shutil
 import urllib.error
 import enum
 
-from osbenchmark import exceptions, paths, PROGRAM_NAME
-from osbenchmark.exceptions import BuildError, SystemSetupError
-from osbenchmark.utils import git, io, process, net, jvm, convert, sysstats
+from opensearch_benchmark import exceptions, paths, PROGRAM_NAME
+from opensearch_benchmark.exceptions import BuildError, SystemSetupError
+from opensearch_benchmark.utils import git, io, process, net, jvm, convert, sysstats
 
 # e.g. my-plugin:current - we cannot simply use String#split(":") as this would not work for timestamp-based revisions
 REVISION_PATTERN = r"(\w.*?):(.*)"

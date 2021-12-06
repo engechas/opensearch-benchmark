@@ -25,7 +25,7 @@
 import re
 import functools
 
-from osbenchmark import exceptions
+from opensearch_benchmark import exceptions
 
 VERSIONS = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$")
 

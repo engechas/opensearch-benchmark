@@ -30,10 +30,10 @@ import threading
 
 import tabulate
 
-from osbenchmark import metrics, time, exceptions
-from osbenchmark.metrics import MetaInfoScope
-from osbenchmark.utils import io, sysstats, console, opts, process
-from osbenchmark.utils.versions import components
+from opensearch_benchmark import metrics, time, exceptions
+from opensearch_benchmark.metrics import MetaInfoScope
+from opensearch_benchmark.utils import io, sysstats, console, opts, process
+from opensearch_benchmark.utils.versions import components
 
 
 def list_telemetry():

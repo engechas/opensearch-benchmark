@@ -28,8 +28,8 @@ import logging.config
 import os
 import time
 
-from osbenchmark import paths
-from osbenchmark.utils import io
+from opensearch_benchmark import paths
+from opensearch_benchmark.utils import io
 
 
 # pylint: disable=unused-argument
@@ -117,7 +117,7 @@ def configure_logging():
     # Avoid failures such as the following (shortened a bit):
     #
     # ---------------------------------------------------------------------------------------------
-    # "osbenchmark/worker_coordinator/worker_coordinator.py", line 220, in create_client
+    # "opensearch_benchmark/worker_coordinator/worker_coordinator.py", line 220, in create_client
     # "thespian-3.8.0-py3.5.egg/thespian/actors.py", line 187, in createActor
     # [...]
     # "thespian-3.8.0-py3.5.egg/thespian/system/multiprocCommon.py", line 348, in _startChildActor

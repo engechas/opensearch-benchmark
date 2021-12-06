@@ -26,10 +26,10 @@
 import logging
 import os
 
-from osbenchmark.utils import process
-from osbenchmark import exceptions
+from opensearch_benchmark.utils import process
+from opensearch_benchmark import exceptions
 
-LOGGER_NAME = "osbenchmark.provisioner.repository_gcs"
+LOGGER_NAME = "opensearch_benchmark.provisioner.repository_gcs"
 
 
 def resolve_binary(install_root, binary_name):

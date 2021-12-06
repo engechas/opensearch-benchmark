@@ -27,7 +27,7 @@ from typing import Any, Mapping
 
 import pytest  # type: ignore
 
-from osbenchmark.utils import collections
+from opensearch_benchmark.utils import collections
 
 
 class TestMergeDicts:

@@ -29,8 +29,8 @@ import shutil
 from enum import Enum
 from string import Template
 
-from osbenchmark import PROGRAM_NAME, exceptions, paths
-from osbenchmark.utils import io
+from opensearch_benchmark import PROGRAM_NAME, exceptions, paths
+from opensearch_benchmark.utils import io
 
 
 class Scope(Enum):

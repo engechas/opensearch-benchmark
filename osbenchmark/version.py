@@ -27,10 +27,10 @@ from importlib import resources
 
 import pkg_resources
 
-from osbenchmark import paths
-from osbenchmark.utils import git, io
+from opensearch_benchmark import paths
+from opensearch_benchmark.utils import git, io
 
-__version__ = pkg_resources.require("osbenchmark")[0].version
+__version__ = pkg_resources.require("opensearch_benchmark")[0].version
 
 __BENCHMARK_VERSION_PATTERN = re.compile(r"^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:.(.+))?$")
 
@@ -78,4 +78,4 @@ def minimum_os_version():
     """
     :return: A string identifying the minimum version of OpenSearch that is supported by Benchmark.
     """
-    return resources.read_text("osbenchmark", "min-os-version.txt").strip()
+    return resources.read_text("opensearch_benchmark", "min-os-version.txt").strip()

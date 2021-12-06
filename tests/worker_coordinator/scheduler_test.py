@@ -26,9 +26,9 @@
 import random
 from unittest import TestCase
 
-from osbenchmark import exceptions
-from osbenchmark.worker_coordinator import scheduler
-from osbenchmark.workload import workload
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.worker_coordinator import scheduler
+from opensearch_benchmark.workload import workload
 
 
 class SchedulerTestCase(TestCase):

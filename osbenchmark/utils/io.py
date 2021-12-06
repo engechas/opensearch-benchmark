@@ -34,7 +34,7 @@ from contextlib import suppress
 
 import mmap
 
-from osbenchmark.utils import console
+from opensearch_benchmark.utils import console
 
 
 class FileSource:

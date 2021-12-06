@@ -28,10 +28,10 @@ import os
 from elasticsearch import ElasticsearchException
 from jinja2 import Environment, FileSystemLoader
 
-from osbenchmark import PROGRAM_NAME
-from osbenchmark.client import OsClientFactory
-from osbenchmark.tracker import corpus, index
-from osbenchmark.utils import io, opts, console
+from opensearch_benchmark import PROGRAM_NAME
+from opensearch_benchmark.client import OsClientFactory
+from opensearch_benchmark.tracker import corpus, index
+from opensearch_benchmark.utils import io, opts, console
 
 
 def process_template(templates_path, template_filename, template_vars, output_path):

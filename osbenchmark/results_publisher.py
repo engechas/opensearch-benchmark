@@ -30,8 +30,8 @@ import sys
 
 import tabulate
 
-from osbenchmark import metrics, exceptions
-from osbenchmark.utils import convert, io as rio, console
+from opensearch_benchmark import metrics, exceptions
+from opensearch_benchmark.utils import convert, io as rio, console
 
 FINAL_SCORE = r"""
 ------------------------------------------------------

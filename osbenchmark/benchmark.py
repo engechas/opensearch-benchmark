@@ -33,13 +33,13 @@ import uuid
 
 import thespian.actors
 
-from osbenchmark import PROGRAM_NAME, BANNER, FORUM_LINK, SKULL, check_python_version, doc_link, telemetry
-from osbenchmark import version, actor, config, paths, \
+from opensearch_benchmark import PROGRAM_NAME, BANNER, FORUM_LINK, SKULL, check_python_version, doc_link, telemetry
+from opensearch_benchmark import version, actor, config, paths, \
     test_execution_orchestrator, results_publisher, \
         metrics, workload, chart_generator, exceptions, log
-from osbenchmark.builder import provision_config, builder
-from osbenchmark.tracker import tracker
-from osbenchmark.utils import io, convert, process, console, net, opts, versions
+from opensearch_benchmark.builder import provision_config, builder
+from opensearch_benchmark.tracker import tracker
+from opensearch_benchmark.utils import io, convert, process, console, net, opts, versions
 
 
 def create_arg_parser():

@@ -25,7 +25,7 @@
 import difflib
 import json
 
-from osbenchmark.utils import io
+from opensearch_benchmark.utils import io
 
 
 def csv_to_list(csv):

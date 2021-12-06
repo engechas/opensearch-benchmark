@@ -29,8 +29,8 @@ from enum import Enum
 
 import tabulate
 
-from osbenchmark import exceptions, PROGRAM_NAME
-from osbenchmark.utils import console, repo, io, modules
+from opensearch_benchmark import exceptions, PROGRAM_NAME
+from opensearch_benchmark.utils import console, repo, io, modules
 
 PROVISION_CONFIG_FORMAT_VERSION = 1
 

@@ -36,9 +36,9 @@ import jsonschema
 import tabulate
 from jinja2 import meta
 
-from osbenchmark import exceptions, time, PROGRAM_NAME, config, version
-from osbenchmark.workload import params, workload
-from osbenchmark.utils import io, collections, convert, net, console, modules, opts, repo
+from opensearch_benchmark import exceptions, time, PROGRAM_NAME, config, version
+from opensearch_benchmark.workload import params, workload
+from opensearch_benchmark.utils import io, collections, convert, net, console, modules, opts, repo
 
 
 class WorkloadSyntaxError(exceptions.InvalidSyntax):

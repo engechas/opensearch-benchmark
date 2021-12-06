@@ -29,9 +29,9 @@ import subprocess
 
 import psutil
 
-from osbenchmark import time, exceptions, telemetry
-from osbenchmark.builder import cluster, java_resolver
-from osbenchmark.utils import io, opts, process
+from opensearch_benchmark import time, exceptions, telemetry
+from opensearch_benchmark.builder import cluster, java_resolver
+from opensearch_benchmark.utils import io, opts, process
 
 
 class DockerLauncher:

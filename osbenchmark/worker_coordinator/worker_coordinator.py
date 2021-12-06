@@ -40,10 +40,10 @@ from enum import Enum
 
 import thespian.actors
 
-from osbenchmark import actor, config, exceptions, metrics, workload, client, paths, PROGRAM_NAME, telemetry
-from osbenchmark.worker_coordinator import runner, scheduler
-from osbenchmark.workload import WorkloadProcessorRegistry, load_workload, load_workload_plugins
-from osbenchmark.utils import convert, console, net
+from opensearch_benchmark import actor, config, exceptions, metrics, workload, client, paths, PROGRAM_NAME, telemetry
+from opensearch_benchmark.worker_coordinator import runner, scheduler
+from opensearch_benchmark.workload import WorkloadProcessorRegistry, load_workload, load_workload_plugins
+from opensearch_benchmark.utils import convert, console, net
 
 
 ##################################

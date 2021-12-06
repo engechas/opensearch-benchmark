@@ -25,8 +25,8 @@
 import os
 from unittest import TestCase
 
-from osbenchmark import exceptions
-from osbenchmark.builder import provision_config
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.builder import provision_config
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 

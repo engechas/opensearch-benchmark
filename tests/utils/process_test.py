@@ -28,7 +28,7 @@ from unittest import TestCase
 
 import psutil
 
-from osbenchmark.utils import process
+from opensearch_benchmark.utils import process
 
 
 class ProcessTests(TestCase):
@@ -69,15 +69,15 @@ class ProcessTests(TestCase):
                                                                    "org.elasticsearch.bootstrap.Elasticsearch"])
         random_python = ProcessTests.Process(103, "python3", ["/some/django/app"])
         other_process = ProcessTests.Process(104, "init", ["/usr/sbin/init"])
-        benchmark_process_p = ProcessTests.Process(105, "python3", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_r = ProcessTests.Process(106, "benchmark", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_e = ProcessTests.Process(107, "osbenchmark", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_mac = ProcessTests.Process(108, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/osbenchmark"])
+        benchmark_process_p = ProcessTests.Process(105, "python3", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_r = ProcessTests.Process(106, "benchmark", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_e = ProcessTests.Process(107, "opensearch_benchmark", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_mac = ProcessTests.Process(108, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/opensearch_benchmark"])
         # fake own process by determining our pid
         own_benchmark_process = ProcessTests.Process(
             os.getpid(), "Python",
             ["/Python.app/Contents/MacOS/Python",
-            "~/.local/bin/osbenchmark"])
+            "~/.local/bin/opensearch_benchmark"])
         night_benchmark_process = ProcessTests.Process(110, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/night_benchmark"])
 
         process_iter.return_value = [
@@ -123,14 +123,14 @@ class ProcessTests(TestCase):
                                                                    "org.elasticsearch.bootstrap.Elasticsearch"])
         random_python = ProcessTests.Process(103, "python3", ["/some/django/app"])
         other_process = ProcessTests.Process(104, "init", ["/usr/sbin/init"])
-        benchmark_process_p = ProcessTests.Process(105, "python3", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_r = ProcessTests.Process(106, "benchmark", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_e = ProcessTests.Process(107, "osbenchmark", ["/usr/bin/python3", "~/.local/bin/osbenchmark"])
-        benchmark_process_mac = ProcessTests.Process(108, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/osbenchmark"])
+        benchmark_process_p = ProcessTests.Process(105, "python3", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_r = ProcessTests.Process(106, "benchmark", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_e = ProcessTests.Process(107, "opensearch_benchmark", ["/usr/bin/python3", "~/.local/bin/opensearch_benchmark"])
+        benchmark_process_mac = ProcessTests.Process(108, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/opensearch_benchmark"])
         # fake own process by determining our pid
         own_benchmark_process = ProcessTests.Process(
             os.getpid(), "Python",
-            ["/Python.app/Contents/MacOS/Python", "~/.local/bin/osbenchmark"])
+            ["/Python.app/Contents/MacOS/Python", "~/.local/bin/opensearch_benchmark"])
         night_benchmark_process = ProcessTests.Process(110, "Python", ["/Python.app/Contents/MacOS/Python", "~/.local/bin/night_benchmark"])
 
         process_iter.return_value = [

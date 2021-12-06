@@ -27,8 +27,8 @@ import logging
 import os
 import sys
 
-from osbenchmark import exceptions
-from osbenchmark.utils import io
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.utils import io
 
 
 class ComponentLoader:

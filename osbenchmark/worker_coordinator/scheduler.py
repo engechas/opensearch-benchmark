@@ -28,8 +28,8 @@ import random
 import types
 from abc import ABC, abstractmethod
 
-import osbenchmark.workload
-from osbenchmark import exceptions
+import opensearch_benchmark.workload
+from opensearch_benchmark import exceptions
 
 # Mapping from task to scheduler
 __SCHEDULERS = {}
@@ -86,7 +86,7 @@ task's parameter source into this property.
 """
 
 
-def scheduler_for(task: osbenchmark.workload.Task):
+def scheduler_for(task: opensearch_benchmark.workload.Task):
     """
     Creates a scheduler instance
 

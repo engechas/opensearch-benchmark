@@ -29,8 +29,8 @@ import time
 import certifi
 import urllib3
 
-from osbenchmark import exceptions, doc_link
-from osbenchmark.utils import console, convert
+from opensearch_benchmark import exceptions, doc_link
+from opensearch_benchmark.utils import console, convert
 
 
 class RequestContextManager:
@@ -224,7 +224,7 @@ class OsClientFactory:
     def create_async(self):
         # pylint: disable=import-outside-toplevel
         import elasticsearch
-        import osbenchmark.async_connection
+        import opensearch_benchmark.async_connection
         import io
         import aiohttp
 
@@ -258,7 +258,7 @@ class OsClientFactory:
             pass
 
         return BenchmarkAsyncOpenSearch(hosts=self.hosts,
-                                       connection_class=osbenchmark.async_connection.AIOHttpConnection,
+                                       connection_class=opensearch_benchmark.async_connection.AIOHttpConnection,
                                        ssl_context=self.ssl_context,
                                        **self.client_options)
 

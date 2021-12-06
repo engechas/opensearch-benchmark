@@ -24,8 +24,8 @@
 
 import logging
 
-from osbenchmark import exceptions
-from osbenchmark.utils import jvm, sysstats
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.utils import jvm, sysstats
 
 
 def java_home(provision_config_instance_runtime_jdks, specified_runtime_jdk=None, provides_bundled_jdk=False):

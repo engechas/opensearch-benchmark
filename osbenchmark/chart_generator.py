@@ -27,8 +27,8 @@ import json
 import logging
 import uuid
 
-from osbenchmark import workload, config, exceptions
-from osbenchmark.utils import io, console
+from opensearch_benchmark import workload, config, exceptions
+from opensearch_benchmark.utils import io, console
 
 color_scheme_rgba = [
     # #00BFB3

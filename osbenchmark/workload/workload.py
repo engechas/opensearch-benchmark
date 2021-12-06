@@ -27,7 +27,7 @@ import numbers
 import re
 from enum import Enum, unique
 
-from osbenchmark import exceptions
+from opensearch_benchmark import exceptions
 
 
 class Index:

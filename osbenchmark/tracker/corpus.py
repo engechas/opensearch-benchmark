@@ -27,7 +27,7 @@ import json
 import logging
 import os
 
-from osbenchmark.utils import console
+from opensearch_benchmark.utils import console
 
 
 DOCS_COMPRESSOR = bz2.BZ2Compressor

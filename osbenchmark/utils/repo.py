@@ -26,8 +26,8 @@ import logging
 import os
 import sys
 
-from osbenchmark import exceptions, config
-from osbenchmark.utils import io, git, console, versions
+from opensearch_benchmark import exceptions, config
+from opensearch_benchmark.utils import io, git, console, versions
 
 
 class BenchmarkRepository:
@@ -134,7 +134,7 @@ class BenchmarkRepository:
 
     def useOpensearchBenchmarkProvisionConfigs(self, distribution_version):
         self.logger.info("Using default-provision-config directory within repository")
-        root_dir = os.getcwd().split("/osbenchmark")[0]
+        root_dir = os.getcwd().split("/opensearch_benchmark")[0]
         provisionconfigs_path = os.path.join(root_dir, "opensearch-benchmark-provisionconfigs")
 
         branch_version = self.selectBranchVersion(distribution_version, provisionconfigs_path)

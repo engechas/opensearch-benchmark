@@ -39,8 +39,8 @@ from http.client import responses
 
 import tabulate
 
-from osbenchmark import client, time, exceptions, config, version, paths
-from osbenchmark.utils import convert, console, io, versions
+from opensearch_benchmark import client, time, exceptions, config, version, paths
+from opensearch_benchmark.utils import convert, console, io, versions
 
 
 class OsClient:

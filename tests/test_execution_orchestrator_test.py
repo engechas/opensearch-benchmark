@@ -28,7 +28,7 @@ import unittest.mock as mock
 
 import pytest
 
-from osbenchmark import config, exceptions, test_execution_orchestrator
+from opensearch_benchmark import config, exceptions, test_execution_orchestrator
 
 
 @pytest.fixture

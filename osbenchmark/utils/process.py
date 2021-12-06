@@ -105,11 +105,11 @@ def run_subprocess_with_logging(command_line, header=None, level=logging.INFO, s
 
 
 def is_benchmark_process(p):
-    return p.name() == "osbenchmark" or \
+    return p.name() == "opensearch_benchmark" or \
            p.name() == "benchmark" or \
            (p.name().lower().startswith("python")
-            and any("osbenchmark" in e for e in p.cmdline())
-            and not any("osbenchmarkd" in e for e in p.cmdline()))
+            and any("opensearch_benchmark" in e for e in p.cmdline())
+            and not any("opensearch_benchmarkd" in e for e in p.cmdline()))
 
 
 def find_all_other_benchmark_processes():
@@ -147,10 +147,10 @@ def for_all_other_processes(predicate, action):
 
 def kill_running_benchmark_instances():
     def benchmark_process(p):
-        return p.name() == "osbenchmark" or \
+        return p.name() == "opensearch_benchmark" or \
                p.name() == "benchmark" or \
                (p.name().lower().startswith("python")
-                and any("osbenchmark" in e for e in p.cmdline())
-                and not any("osbenchmarkd" in e for e in p.cmdline()))
+                and any("opensearch_benchmark" in e for e in p.cmdline())
+                and not any("opensearch_benchmarkd" in e for e in p.cmdline()))
 
     kill_all(benchmark_process)

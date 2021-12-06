@@ -27,8 +27,8 @@ import logging
 import sys
 import time
 
-from osbenchmark import actor, version, exceptions, doc_link, BANNER, PROGRAM_NAME, check_python_version, log
-from osbenchmark.utils import console
+from opensearch_benchmark import actor, version, exceptions, doc_link, BANNER, PROGRAM_NAME, check_python_version, log
+from opensearch_benchmark.utils import console
 
 
 def start(args):

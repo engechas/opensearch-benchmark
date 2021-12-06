@@ -27,10 +27,10 @@ import logging
 import os
 import subprocess
 
-from osbenchmark.utils import process
-from osbenchmark import exceptions
+from opensearch_benchmark.utils import process
+from opensearch_benchmark import exceptions
 
-LOGGER_NAME = "osbenchmark.provisioner.repository_azure"
+LOGGER_NAME = "opensearch_benchmark.provisioner.repository_azure"
 
 
 def resolve_binary(install_root, binary_name):

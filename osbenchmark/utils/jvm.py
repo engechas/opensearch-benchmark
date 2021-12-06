@@ -25,8 +25,8 @@
 import os
 import re
 
-from osbenchmark import exceptions
-from osbenchmark.utils import io, process
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.utils import io, process
 
 
 def _java(java_home):

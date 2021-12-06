@@ -34,9 +34,9 @@ from abc import ABC
 import time
 from enum import Enum
 
-from osbenchmark import exceptions
-from osbenchmark.workload import workload
-from osbenchmark.utils import io
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.workload import workload
+from opensearch_benchmark.utils import io
 
 __PARAM_SOURCES_BY_OP = {}
 __PARAM_SOURCES_BY_NAME = {}

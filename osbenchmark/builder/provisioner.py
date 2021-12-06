@@ -31,9 +31,9 @@ import uuid
 
 import jinja2
 
-from osbenchmark import exceptions
-from osbenchmark.builder import provision_config, java_resolver
-from osbenchmark.utils import console, convert, io, process, versions
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.builder import provision_config, java_resolver
+from opensearch_benchmark.utils import console, convert, io, process, versions
 
 
 def local(cfg, provision_config_instance, plugins, ip, http_port, all_node_ips, all_node_names, target_root, node_name):

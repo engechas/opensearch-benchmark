@@ -41,7 +41,7 @@ from io import BytesIO
 
 import ijson
 
-from osbenchmark import exceptions, workload
+from opensearch_benchmark import exceptions, workload
 
 # Mapping from operation type to specific runner
 

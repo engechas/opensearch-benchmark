@@ -31,8 +31,8 @@ from urllib.parse import quote, parse_qs, urlencode, urlparse, urlunparse
 import certifi
 import urllib3
 
-from osbenchmark import exceptions
-from osbenchmark.utils import console, convert
+from opensearch_benchmark import exceptions
+from opensearch_benchmark.utils import console, convert
 
 __HTTP = None
 
@@ -90,7 +90,7 @@ def _download_from_s3_bucket(bucket_name, bucket_path, local_path, expected_size
         _fake_import_boto3()
         import boto3.s3.transfer
     except ImportError:
-        console.error("S3 support is optional. Install it with `python -m pip install osbenchmark[s3]`")
+        console.error("S3 support is optional. Install it with `python -m pip install opensearch_benchmark[s3]`")
         raise
 
 

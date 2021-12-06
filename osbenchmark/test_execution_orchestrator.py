@@ -30,10 +30,10 @@ import sys
 import tabulate
 import thespian.actors
 
-from osbenchmark import actor, config, doc_link, \
+from opensearch_benchmark import actor, config, doc_link, \
     worker_coordinator, exceptions, builder, metrics, \
         results_publisher, workload, version, PROGRAM_NAME
-from osbenchmark.utils import console, opts, versions
+from opensearch_benchmark.utils import console, opts, versions
 
 
 pipelines = collections.OrderedDict()

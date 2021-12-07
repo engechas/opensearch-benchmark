@@ -29,7 +29,7 @@ from unittest import TestCase
 
 import pytest
 
-from opensearch_benchmark.utils import console
+from opensearch-benchmark.utils import console
 
 
 class ConsoleFunctionTests(TestCase):

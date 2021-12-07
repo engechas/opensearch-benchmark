@@ -28,10 +28,10 @@ import os
 import shlex
 import subprocess
 
-from opensearch_benchmark.utils import process
-from opensearch_benchmark import exceptions
+from opensearch-benchmark.utils import process
+from opensearch-benchmark import exceptions
 
-LOGGER_NAME = "opensearch_benchmark.provisioner.repository_s3"
+LOGGER_NAME = "opensearch-benchmark.provisioner.repository_s3"
 
 
 def resolve_binary(install_root, binary_name):

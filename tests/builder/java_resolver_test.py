@@ -25,12 +25,12 @@
 import unittest.mock as mock
 from unittest import TestCase
 
-from opensearch_benchmark import exceptions
-from opensearch_benchmark.builder import java_resolver
+from opensearch-benchmark import exceptions
+from opensearch-benchmark.builder import java_resolver
 
 
 class JavaResolverTests(TestCase):
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path")
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path")
     def test_resolves_java_home_for_default_runtime_jdk(self, resolve_jvm_path):
         resolve_jvm_path.return_value = (12, "/opt/jdk12")
         major, java_home = java_resolver.java_home("12,11,10,9,8",
@@ -40,7 +40,7 @@ class JavaResolverTests(TestCase):
         self.assertEqual(major, 12)
         self.assertEqual(java_home, "/opt/jdk12")
 
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path")
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path")
     def test_resolves_java_home_for_specific_runtime_jdk(self, resolve_jvm_path):
         resolve_jvm_path.return_value = (8, "/opt/jdk8")
         major, java_home = java_resolver.java_home("12,11,10,9,8",
@@ -51,7 +51,7 @@ class JavaResolverTests(TestCase):
         self.assertEqual(java_home, "/opt/jdk8")
         resolve_jvm_path.assert_called_with([8])
 
-    @mock.patch("opensearch_benchmark.utils.sysstats.os_name", return_value="Windows")
+    @mock.patch("opensearch-benchmark.utils.sysstats.os_name", return_value="Windows")
     def test_resolves_java_home_for_bundled_jdk_windows(self, os_name):
         with self.assertRaises(exceptions.SystemSetupError) as ctx:
             java_resolver.java_home("12,11,10,9,8", specified_runtime_jdk="bundled", provides_bundled_jdk=True)

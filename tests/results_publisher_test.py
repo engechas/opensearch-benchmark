@@ -24,7 +24,7 @@
 
 from unittest import TestCase
 
-from opensearch_benchmark import results_publisher
+from opensearch-benchmark import results_publisher
 
 
 class FormatterTests(TestCase):

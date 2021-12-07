@@ -25,7 +25,7 @@
 import os
 from unittest import TestCase
 
-from opensearch_benchmark.utils import opts
+from opensearch-benchmark.utils import opts
 
 
 class ConfigHelperFunctionTests(TestCase):

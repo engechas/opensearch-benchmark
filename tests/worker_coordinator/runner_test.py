@@ -31,8 +31,8 @@ from unittest import TestCase
 
 import elasticsearch
 
-from opensearch_benchmark import client, exceptions
-from opensearch_benchmark.worker_coordinator import runner
+from opensearch-benchmark import client, exceptions
+from opensearch-benchmark.worker_coordinator import runner
 from tests import run_async, as_future
 
 

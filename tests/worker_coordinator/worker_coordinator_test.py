@@ -33,9 +33,9 @@ from unittest import TestCase
 
 import elasticsearch
 
-from opensearch_benchmark import metrics, workload, exceptions, config
-from opensearch_benchmark.worker_coordinator import worker_coordinator, runner, scheduler
-from opensearch_benchmark.workload import params
+from opensearch-benchmark import metrics, workload, exceptions, config
+from opensearch-benchmark.worker_coordinator import worker_coordinator, runner, scheduler
+from opensearch-benchmark.workload import params
 from tests import run_async, as_future
 
 
@@ -131,7 +131,7 @@ class WorkerCoordinatorTests(TestCase):
         }
         return mock.Mock(**attrs)
 
-    @mock.patch("opensearch_benchmark.utils.net.resolve")
+    @mock.patch("opensearch-benchmark.utils.net.resolve")
     def test_start_benchmark_and_prepare_workload(self, resolve):
         # override load worker_coordinator host
         self.cfg.add(config.Scope.applicationOverride, "worker_coordinator", "load_worker_coordinator_hosts", ["10.5.5.1", "10.5.5.2"])
@@ -288,7 +288,7 @@ class SamplePostprocessorTests(TestCase):
                          relative_time=relative_time,
                          meta_data={})
 
-    @mock.patch("opensearch_benchmark.metrics.MetricsStore")
+    @mock.patch("opensearch-benchmark.metrics.MetricsStore")
     def test_all_samples(self, metrics_store):
         post_process = worker_coordinator.SamplePostprocessor(metrics_store,
                                                   downsample_factor=1,
@@ -315,7 +315,7 @@ class SamplePostprocessorTests(TestCase):
         ]
         metrics_store.put_value_cluster_level.assert_has_calls(calls)
 
-    @mock.patch("opensearch_benchmark.metrics.MetricsStore")
+    @mock.patch("opensearch-benchmark.metrics.MetricsStore")
     def test_downsamples(self, metrics_store):
         post_process = worker_coordinator.SamplePostprocessor(metrics_store,
                                                   downsample_factor=2,
@@ -343,7 +343,7 @@ class SamplePostprocessorTests(TestCase):
         ]
         metrics_store.put_value_cluster_level.assert_has_calls(calls)
 
-    @mock.patch("opensearch_benchmark.metrics.MetricsStore")
+    @mock.patch("opensearch-benchmark.metrics.MetricsStore")
     def test_dependent_samples(self, metrics_store):
         post_process = worker_coordinator.SamplePostprocessor(metrics_store,
                                                   downsample_factor=1,

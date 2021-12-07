@@ -24,8 +24,8 @@
 
 from unittest import TestCase
 
-from opensearch_benchmark import exceptions
-from opensearch_benchmark.workload import workload
+from opensearch-benchmark import exceptions
+from opensearch-benchmark.workload import workload
 
 
 class WorkloadTests(TestCase):

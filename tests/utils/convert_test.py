@@ -24,7 +24,7 @@
 
 from unittest import TestCase
 
-from opensearch_benchmark.utils import convert
+from opensearch-benchmark.utils import convert
 
 
 class ToBoolTests(TestCase):

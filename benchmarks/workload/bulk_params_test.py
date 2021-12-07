@@ -26,7 +26,7 @@ import sys
 
 import pytest
 
-from opensearch_benchmark.workload import params
+from opensearch-benchmark.workload import params
 
 
 class StaticSource:

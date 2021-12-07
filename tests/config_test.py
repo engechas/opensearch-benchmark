@@ -25,7 +25,7 @@
 import configparser
 from unittest import TestCase
 
-from opensearch_benchmark import config, exceptions
+from opensearch-benchmark import config, exceptions
 
 
 class MockInput:

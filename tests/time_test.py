@@ -25,14 +25,14 @@
 import time
 from unittest import TestCase
 
-import opensearch_benchmark.time
+import opensearch-benchmark.time
 
 
 class TimeTests(TestCase):
     def test_split_time_increases(self):
         wait_period_seconds = 0.05
 
-        stop_watch = opensearch_benchmark.time.Clock.stop_watch()
+        stop_watch = opensearch-benchmark.time.Clock.stop_watch()
         stop_watch.start()
         prev_split_time = 0
         for _ in range(3):
@@ -48,7 +48,7 @@ class TimeTests(TestCase):
         wait_period_seconds = 0.05
         acceptable_delta_seconds = 0.03
 
-        stop_watch = opensearch_benchmark.time.Clock.stop_watch()
+        stop_watch = opensearch-benchmark.time.Clock.stop_watch()
         stop_watch.start()
         time.sleep(wait_period_seconds)
         stop_watch.stop()
@@ -62,9 +62,9 @@ class TimeTests(TestCase):
         wait_period_millis = 50
         acceptable_delta_millis = 30
 
-        start = opensearch_benchmark.time.to_epoch_millis(opensearch_benchmark.time.Clock.now())
+        start = opensearch-benchmark.time.to_epoch_millis(opensearch-benchmark.time.Clock.now())
         time.sleep(wait_period_millis / 1000.0)
-        end = opensearch_benchmark.time.to_epoch_millis(opensearch_benchmark.time.Clock.now())
+        end = opensearch-benchmark.time.to_epoch_millis(opensearch-benchmark.time.Clock.now())
 
         interval_millis = end - start
 

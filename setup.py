@@ -125,7 +125,7 @@ first_supported_version = "{}.{}".format(supported_python_versions[0][0], suppor
 # next minor after the latest supported version
 first_unsupported_version = "{}.{}".format(supported_python_versions[-1][0], supported_python_versions[-1][1] + 1)
 
-# we call the tool benchmark, but it will be published as opensearch_benchmark on pypi
+# we call the tool benchmark, but it will be published as opensearch-benchmark on pypi
 setup(name="opensearch-benchmark",
       maintainer="Ian Hoang, Achit Ojha, Travis Benedict, Chase Engelbrecht, Govind Kamat, Phill Treddenick",
       maintainer_email="hoangia@amazon.com, achiojha@amazon.com, benedtra@amazon.com, engechas@amazon.com, govkamat@amazon.com, treddeni@amazon.com",
@@ -163,8 +163,8 @@ setup(name="opensearch-benchmark",
       },
       entry_points={
           "console_scripts": [
-              "opensearch-benchmark=opensearch_benchmark.benchmark:main",
-              "opensearch-benchmarkd=opensearch_benchmark.benchmarkd:main"
+              "opensearch-benchmark=opensearch-benchmark.benchmark:main",
+              "opensearch-benchmarkd=opensearch-benchmark.benchmarkd:main"
           ],
       },
       classifiers=[

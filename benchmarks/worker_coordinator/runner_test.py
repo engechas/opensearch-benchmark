@@ -24,7 +24,7 @@
 
 import pytest
 
-from opensearch_benchmark.worker_coordinator import runner
+from opensearch-benchmark.worker_coordinator import runner
 
 bulk_index = runner.BulkIndex()
 

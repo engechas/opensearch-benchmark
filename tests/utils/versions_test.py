@@ -27,8 +27,8 @@ import re
 
 import pytest  # type: ignore
 
-from opensearch_benchmark import exceptions
-from opensearch_benchmark.utils import versions
+from opensearch-benchmark import exceptions
+from opensearch-benchmark.utils import versions
 
 
 class TestsVersions:

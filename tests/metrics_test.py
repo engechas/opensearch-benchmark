@@ -36,9 +36,9 @@ from unittest import TestCase
 
 import elasticsearch.exceptions
 
-from opensearch_benchmark import config, metrics, workload, exceptions, paths
-from opensearch_benchmark.metrics import GlobalStatsCalculator
-from opensearch_benchmark.workload import Task, Operation, TestProcedure, Workload
+from opensearch-benchmark import config, metrics, workload, exceptions, paths
+from opensearch-benchmark.metrics import GlobalStatsCalculator
+from opensearch-benchmark.workload import Task, Operation, TestProcedure, Workload
 
 
 class MockClientFactory:
@@ -152,7 +152,7 @@ class OsClientTests(TestCase):
         def __init__(self, hosts):
             self.transport = OsClientTests.TransportMock(hosts)
 
-    @mock.patch("opensearch_benchmark.client.OsClientFactory")
+    @mock.patch("opensearch-benchmark.client.OsClientFactory")
     def test_config_opts_parsing(self, client_OsClientfactory):
         cfg = config.Config()
 
@@ -235,7 +235,7 @@ class OsClientTests(TestCase):
 
     def test_retries_on_various_transport_errors(self):
         @mock.patch("random.random")
-        @mock.patch("opensearch_benchmark.time.sleep")
+        @mock.patch("opensearch-benchmark.time.sleep")
         def test_transport_error_retries(side_effect, expected_logging_calls, expected_sleep_calls, mocked_sleep, mocked_random):
             # should return on first success
             operation = mock.Mock(side_effect=side_effect)
@@ -245,7 +245,7 @@ class OsClientTests(TestCase):
 
             client = metrics.OsClient(OsClientTests.ClientMock([{"host": "127.0.0.1", "port": "9243"}]))
 
-            logger = logging.getLogger("opensearch_benchmark.metrics")
+            logger = logging.getLogger("opensearch-benchmark.metrics")
             with mock.patch.object(logger, "debug") as mocked_debug_logger:
                 test_result = client.guarded(operation)
                 mocked_sleep.assert_has_calls(expected_sleep_calls)
@@ -279,7 +279,7 @@ class OsClientTests(TestCase):
                                      rnd_mocked_logger_calls,
                                      mocked_sleep_calls)
 
-    @mock.patch("opensearch_benchmark.time.sleep")
+    @mock.patch("opensearch-benchmark.time.sleep")
     def test_fails_after_too_many_errors(self, mocked_sleep):
         def random_transport_error(rnd_resp_code):
             raise elasticsearch.exceptions.TransportError(rnd_resp_code, TransportErrors.err_return_codes[rnd_resp_code])

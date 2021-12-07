@@ -28,8 +28,8 @@ import datetime
 import unittest.mock as mock
 from unittest import TestCase
 
-from opensearch_benchmark import exceptions, config
-from opensearch_benchmark.builder import supplier, provision_config
+from opensearch-benchmark import exceptions, config
+from opensearch-benchmark.builder import supplier, provision_config
 
 
 class RevisionExtractorTests(TestCase):
@@ -50,10 +50,10 @@ class RevisionExtractorTests(TestCase):
 
 
 class SourceRepositoryTests(TestCase):
-    @mock.patch("opensearch_benchmark.utils.git.head_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.pull", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.clone", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.is_working_copy", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.head_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.pull", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.clone", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.is_working_copy", autospec=True)
     def test_intial_checkout_latest(self, mock_is_working_copy, mock_clone, mock_pull, mock_head_revision):
         # before cloning, it is not a working copy, afterwards it is
         mock_is_working_copy.side_effect = [False, True]
@@ -67,10 +67,10 @@ class SourceRepositoryTests(TestCase):
         mock_pull.assert_called_with("/src")
         mock_head_revision.assert_called_with("/src")
 
-    @mock.patch("opensearch_benchmark.utils.git.head_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.pull")
-    @mock.patch("opensearch_benchmark.utils.git.clone")
-    @mock.patch("opensearch_benchmark.utils.git.is_working_copy", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.head_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.pull")
+    @mock.patch("opensearch-benchmark.utils.git.clone")
+    @mock.patch("opensearch-benchmark.utils.git.is_working_copy", autospec=True)
     def test_checkout_current(self, mock_is_working_copy, mock_clone, mock_pull, mock_head_revision):
         mock_is_working_copy.return_value = True
         mock_head_revision.return_value = "HEAD"
@@ -84,11 +84,11 @@ class SourceRepositoryTests(TestCase):
         mock_head_revision.assert_called_with("/src")\
 
 
-    @mock.patch("opensearch_benchmark.utils.git.head_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.checkout")
-    @mock.patch("opensearch_benchmark.utils.git.pull")
-    @mock.patch("opensearch_benchmark.utils.git.clone")
-    @mock.patch("opensearch_benchmark.utils.git.is_working_copy", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.head_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.checkout")
+    @mock.patch("opensearch-benchmark.utils.git.pull")
+    @mock.patch("opensearch-benchmark.utils.git.clone")
+    @mock.patch("opensearch-benchmark.utils.git.is_working_copy", autospec=True)
     def test_checkout_revision_for_local_only_repo(self, mock_is_working_copy, mock_clone, mock_pull, mock_checkout, mock_head_revision):
         mock_is_working_copy.return_value = True
         mock_head_revision.return_value = "HEAD"
@@ -103,9 +103,9 @@ class SourceRepositoryTests(TestCase):
         mock_checkout.assert_called_with("/src", "67c2f42")
         mock_head_revision.assert_called_with("/src")
 
-    @mock.patch("opensearch_benchmark.utils.git.head_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.pull_ts", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.is_working_copy", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.head_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.pull_ts", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.is_working_copy", autospec=True)
     def test_checkout_ts(self, mock_is_working_copy, mock_pull_ts, mock_head_revision):
         mock_is_working_copy.return_value = True
         mock_head_revision.return_value = "HEAD"
@@ -117,9 +117,9 @@ class SourceRepositoryTests(TestCase):
         mock_pull_ts.assert_called_with("/src", "2015-01-01-01:00:00")
         mock_head_revision.assert_called_with("/src")
 
-    @mock.patch("opensearch_benchmark.utils.git.head_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.pull_revision", autospec=True)
-    @mock.patch("opensearch_benchmark.utils.git.is_working_copy", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.head_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.pull_revision", autospec=True)
+    @mock.patch("opensearch-benchmark.utils.git.is_working_copy", autospec=True)
     def test_checkout_revision(self, mock_is_working_copy, mock_pull_revision, mock_head_revision):
         mock_is_working_copy.return_value = True
         mock_head_revision.return_value = "HEAD"
@@ -141,8 +141,8 @@ class SourceRepositoryTests(TestCase):
 
 
 class BuilderTests(TestCase):
-    @mock.patch("opensearch_benchmark.utils.process.run_subprocess")
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path")
+    @mock.patch("opensearch-benchmark.utils.process.run_subprocess")
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path")
     def test_build_on_jdk_8(self, jvm_resolve_path, mock_run_subprocess):
         jvm_resolve_path.return_value = (8, "/opt/jdk8")
         mock_run_subprocess.return_value = False
@@ -159,8 +159,8 @@ class BuilderTests(TestCase):
 
         mock_run_subprocess.assert_has_calls(calls)
 
-    @mock.patch("opensearch_benchmark.utils.process.run_subprocess")
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path")
+    @mock.patch("opensearch-benchmark.utils.process.run_subprocess")
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path")
     def test_build_on_jdk_10(self, jvm_resolve_path, mock_run_subprocess):
         jvm_resolve_path.return_value = (10, "/opt/jdk10")
         mock_run_subprocess.return_value = False
@@ -184,22 +184,22 @@ class TemplateRendererTests(TestCase):
         self.assertEqual("This is version 1.2.3 on Windows with a arm7 CPU.",
                          renderer.render("This is version {{VERSION}} on {{OSNAME}} with a {{ARCH}} CPU."))
 
-    @mock.patch("opensearch_benchmark.utils.sysstats.os_name", return_value="Linux")
-    @mock.patch("opensearch_benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
+    @mock.patch("opensearch-benchmark.utils.sysstats.os_name", return_value="Linux")
+    @mock.patch("opensearch-benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
     def test_uses_derived_values(self, os_name, cpu_arch):
         renderer = supplier.TemplateRenderer(version="1.2.3")
         self.assertEqual("This is version 1.2.3 on linux with a x86_64 CPU.",
                          renderer.render("This is version {{VERSION}} on {{OSNAME}} with a {{ARCH}} CPU."))
 
-    @mock.patch("opensearch_benchmark.utils.sysstats.os_name", return_value="Linux")
-    @mock.patch("opensearch_benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
+    @mock.patch("opensearch-benchmark.utils.sysstats.os_name", return_value="Linux")
+    @mock.patch("opensearch-benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
     def test_supported_os_enum_match(self, os_name, cpu_arch):
         renderer = supplier.TemplateRenderer(version="1.2.3")
         self.assertEqual("This is version 1.2.3 on linux with a x86_64 CPU.",
                          renderer.render("This is version {{VERSION}} on {{OSNAME}} with a {{ARCH}} CPU."))
 
-    @mock.patch("opensearch_benchmark.utils.sysstats.os_name", return_value="Darwin")
-    @mock.patch("opensearch_benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
+    @mock.patch("opensearch-benchmark.utils.sysstats.os_name", return_value="Darwin")
+    @mock.patch("opensearch-benchmark.utils.sysstats.cpu_arch", return_value="X86_64")
     def test_supported_os_enum_returns_default(self, os_name, cpu_arch):
         renderer = supplier.TemplateRenderer(version="1.2.3")
         self.assertEqual("This is version 1.2.3 on linux with a x86_64 CPU.",
@@ -207,9 +207,9 @@ class TemplateRendererTests(TestCase):
 
 
 class CachedOpenSearchSourceSupplierTests(TestCase):
-    @mock.patch("opensearch_benchmark.utils.io.ensure_dir")
+    @mock.patch("opensearch-benchmark.utils.io.ensure_dir")
     @mock.patch("shutil.copy")
-    @mock.patch("opensearch_benchmark.builder.supplier.OpenSearchSourceSupplier")
+    @mock.patch("opensearch-benchmark.builder.supplier.OpenSearchSourceSupplier")
     def test_does_not_cache_when_no_revision(self, opensearch, copy, ensure_dir):
         def add_os_artifact(binaries):
             binaries["opensearch"] = "/path/to/artifact.tar.gz"
@@ -246,7 +246,7 @@ class CachedOpenSearchSourceSupplierTests(TestCase):
         self.assertEqual("/path/to/artifact.tar.gz", binaries["opensearch"])
 
     @mock.patch("os.path.exists")
-    @mock.patch("opensearch_benchmark.builder.supplier.OpenSearchSourceSupplier")
+    @mock.patch("opensearch-benchmark.builder.supplier.OpenSearchSourceSupplier")
     def test_uses_already_cached_artifact(self, opensearch, path_exists):
         # assume that the artifact is already cached
         path_exists.return_value = True
@@ -279,10 +279,10 @@ class CachedOpenSearchSourceSupplierTests(TestCase):
         self.assertIn("opensearch", binaries)
         self.assertEqual("/tmp/opensearch-abc123-linux-x64.tar.gz", binaries["opensearch"])
 
-    @mock.patch("opensearch_benchmark.utils.io.ensure_dir")
+    @mock.patch("opensearch-benchmark.utils.io.ensure_dir")
     @mock.patch("os.path.exists")
     @mock.patch("shutil.copy")
-    @mock.patch("opensearch_benchmark.builder.supplier.OpenSearchSourceSupplier")
+    @mock.patch("opensearch-benchmark.builder.supplier.OpenSearchSourceSupplier")
     def test_caches_artifact(self, opensearch, copy, path_exists, ensure_dir):
         def add_os_artifact(binaries):
             binaries["opensearch"] = "/path/to/artifact.tar.gz"
@@ -332,10 +332,10 @@ class CachedOpenSearchSourceSupplierTests(TestCase):
         self.assertEqual(1, opensearch.add.call_count, "internal supplier is not called again")
         self.assertTrue(cached_supplier.cached)
 
-    @mock.patch("opensearch_benchmark.utils.io.ensure_dir")
+    @mock.patch("opensearch-benchmark.utils.io.ensure_dir")
     @mock.patch("os.path.exists")
     @mock.patch("shutil.copy")
-    @mock.patch("opensearch_benchmark.builder.supplier.OpenSearchSourceSupplier")
+    @mock.patch("opensearch-benchmark.builder.supplier.OpenSearchSourceSupplier")
     def test_does_not_cache_on_copy_error(self, opensearch, copy, path_exists, ensure_dir):
         def add_os_artifact(binaries):
             binaries["opensearch"] = "/path/to/artifact.tar.gz"
@@ -706,7 +706,7 @@ class CreateSupplierTests(TestCase):
         self.assertEqual(1, len(composite_supplier.suppliers))
         self.assertIsInstance(composite_supplier.suppliers[0], supplier.OpenSearchDistributionSupplier)
 
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path", lambda v: (v, "/opt/java/java{}".format(v)))
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path", lambda v: (v, "/opt/java/java{}".format(v)))
     def test_create_suppliers_for_os_distribution_plugin_source_build(self):
         cfg = config.Config()
         cfg.add(config.Scope.application, "builder", "distribution.version", "1.0.0")
@@ -743,7 +743,7 @@ class CreateSupplierTests(TestCase):
         self.assertEqual(external_plugin, composite_supplier.suppliers[2].source_supplier.plugin)
         self.assertIsNotNone(composite_supplier.suppliers[2].source_supplier.builder)
 
-    @mock.patch("opensearch_benchmark.utils.jvm.resolve_path", lambda v: (v, "/opt/java/java{}".format(v)))
+    @mock.patch("opensearch-benchmark.utils.jvm.resolve_path", lambda v: (v, "/opt/java/java{}".format(v)))
     def test_create_suppliers_for_os_and_plugin_source_build(self):
         cfg = config.Config()
         cfg.add(config.Scope.application, "builder", "source.revision", "opensearch:abc,community-plugin:current")
@@ -783,8 +783,8 @@ class CreateSupplierTests(TestCase):
 
 
 class DistributionRepositoryTests(TestCase):
-    @mock.patch("opensearch_benchmark.utils.sysstats.os_name", return_value="Linux")
-    @mock.patch("opensearch_benchmark.utils.sysstats.cpu_arch", return_value="x64")
+    @mock.patch("opensearch-benchmark.utils.sysstats.os_name", return_value="Linux")
+    @mock.patch("opensearch-benchmark.utils.sysstats.cpu_arch", return_value="x64")
     def test_release_repo_config_with_default_url(self, os_name, cpu_arch):
         renderer = supplier.TemplateRenderer(version="1.0.0")
         repo = supplier.DistributionRepository(name="release", distribution_config={

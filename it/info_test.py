@@ -23,28 +23,28 @@
 # under the License.
 
 import it
-from opensearch_benchmark.utils import process
+from opensearch-benchmark.utils import process
 
 
 @it.benchmark_in_mem
 def test_workload_info_with_test_procedure(cfg):
-    assert it.opensearch_benchmark(cfg, "info --workload=geonames --test-procedure=append-no-conflicts") == 0
+    assert it.opensearch-benchmark(cfg, "info --workload=geonames --test-procedure=append-no-conflicts") == 0
 
 
 @it.benchmark_in_mem
 def test_workload_info_with_workload_repo(cfg):
-    assert it.opensearch_benchmark(cfg, "info --workload-repository=default --workload=geonames") == 0
+    assert it.opensearch-benchmark(cfg, "info --workload-repository=default --workload=geonames") == 0
 
 
 @it.benchmark_in_mem
 def test_workload_info_with_task_filter(cfg):
-    assert it.opensearch_benchmark(cfg, "info --workload=geonames --test-procedure=append-no-conflicts --include-tasks=\"type:search\"") == 0
+    assert it.opensearch-benchmark(cfg, "info --workload=geonames --test-procedure=append-no-conflicts --include-tasks=\"type:search\"") == 0
 
 
 @it.benchmark_in_mem
 def test_workload_info_fails_with_wrong_workload_params(cfg):
     # simulate a typo in workload parameter
-    cmd = it.opensearch_benchmark_command_line_for(cfg, "info --workload=geonames --workload-params='conflict_probability:5,number-of-replicas:1'")
+    cmd = it.opensearch-benchmark_command_line_for(cfg, "info --workload=geonames --workload-params='conflict_probability:5,number-of-replicas:1'")
     output = process.run_subprocess_with_output(cmd)
     expected = "Some of your workload parameter(s) \"number-of-replicas\" are not used by this workload; " \
                "perhaps you intend to use \"number_of_replicas\" instead.\n\nAll workload parameters you " \

@@ -25,8 +25,8 @@
 import unittest.mock as mock
 from unittest import TestCase
 
-from opensearch_benchmark import exceptions
-from opensearch_benchmark.utils import jvm
+from opensearch-benchmark import exceptions
+from opensearch-benchmark.utils import jvm
 
 
 class JvmTests(TestCase):

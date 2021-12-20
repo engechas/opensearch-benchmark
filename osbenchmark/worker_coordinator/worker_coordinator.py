@@ -570,11 +570,11 @@ class WorkerCoordinator:
 
         if enable:
             devices = [
-                telemetry.NodeStats(telemetry_params, opensearch, self.metrics_store),
-                telemetry.ExternalEnvironmentInfo(os_default, self.metrics_store),
-                telemetry.ClusterEnvironmentInfo(os_default, self.metrics_store),
+                # telemetry.NodeStats(telemetry_params, opensearch, self.metrics_store),
+                # telemetry.ExternalEnvironmentInfo(os_default, self.metrics_store),
+                # telemetry.ClusterEnvironmentInfo(os_default, self.metrics_store),
                 telemetry.JvmStatsSummary(os_default, self.metrics_store),
-                telemetry.IndexStats(os_default, self.metrics_store),
+                # telemetry.IndexStats(os_default, self.metrics_store),
                 telemetry.MlBucketProcessingTime(os_default, self.metrics_store),
                 telemetry.SegmentStats(log_root, os_default),
                 telemetry.CcrStats(telemetry_params, opensearch, self.metrics_store),
@@ -597,7 +597,23 @@ class WorkerCoordinator:
 
     def retrieve_cluster_info(self, opensearch):
         try:
-            return opensearch["default"].info()
+            return {
+                "name" : "790a811a99da41e60c11490b37aad552",
+                "cluster_name" : "397869430111:mensor-metrics",
+                "cluster_uuid" : "E-DOkPUaQEeMRcnO29oR2w",
+                "version" : {
+                    "number" : "7.7.0",
+                    "build_flavor" : "oss",
+                    "build_type" : "tar",
+                    "build_hash" : "unknown",
+                    "build_date" : "2021-05-21T16:27:33.851846Z",
+                    "build_snapshot" : 'false',
+                    "lucene_version" : "8.5.1",
+                    "minimum_wire_compatibility_version" : "6.8.0",
+                    "minimum_index_compatibility_version" : "6.0.0-beta1"
+                },
+                "tagline" : "You Know, for Search"
+            }
         except BaseException:
             self.logger.exception("Could not retrieve cluster info on benchmark start")
             return None

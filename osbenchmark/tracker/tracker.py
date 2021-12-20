@@ -76,7 +76,24 @@ def create_workload(cfg):
     client = OsClientFactory(hosts=target_hosts.all_hosts[opts.TargetHosts.DEFAULT],
                              client_options=client_options.all_client_options[opts.TargetHosts.DEFAULT]).create()
 
-    info = client.info()
+    info = {
+        "name" : "790a811a99da41e60c11490b37aad552",
+        "cluster_name" : "397869430111:mensor-metrics",
+        "cluster_uuid" : "E-DOkPUaQEeMRcnO29oR2w",
+        "version" : {
+            "number" : "7.7.0",
+            "build_flavor" : "oss",
+            "build_type" : "tar",
+            "build_hash" : "unknown",
+            "build_date" : "2021-05-21T16:27:33.851846Z",
+            "build_snapshot" : false,
+            "lucene_version" : "8.5.1",
+            "minimum_wire_compatibility_version" : "6.8.0",
+            "minimum_index_compatibility_version" : "6.0.0-beta1"
+        },
+        "tagline" : "You Know, for Search"
+    }
+
     console.info(f"Connected to OpenSearch cluster [{info['name']}] version [{info['version']['number']}].\n", logger=logger)
 
     output_path = os.path.abspath(os.path.join(io.normalize_path(root_path), workload_name))

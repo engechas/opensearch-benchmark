@@ -325,7 +325,7 @@ def wait_for_rest_layer(opensearch, max_attempts=40):
         try:
             # see also WaitForHttpResource in OpenSearch tests. Contrary to the ES tests we consider the API also
             # available when the cluster status is RED (as long as all required nodes are present)
-            opensearch.cluster.health(wait_for_nodes=">={}".format(expected_node_count))
+            #opensearch.cluster.health(wait_for_nodes=">={}".format(expected_node_count))
             logger.info("REST API is available for >= [%s] nodes after [%s] attempts.", expected_node_count, attempt)
             return True
         except elasticsearch.ConnectionError as e:

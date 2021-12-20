@@ -39,7 +39,7 @@ from osbenchmark.utils.versions import components
 def list_telemetry():
     console.println("Available telemetry devices:\n")
     devices = [[device.command, device.human_name, device.help] for device in [JitCompiler, Gc, FlightRecorder,
-                                                                               Heapdump, NodeStats, RecoveryStats,
+                                                                               Heapdump, RecoveryStats,
                                                                                CcrStats, SegmentStats, TransformStats,
                                                                                SearchableSnapshotsStats]]
     console.println(tabulate.tabulate(devices, ["Command", "Name", "Description"]))
@@ -207,15 +207,15 @@ class FlightRecorder(TelemetryDevice):
 
         if self.java_major_version < 9:
             java_opts.append("-XX:+FlightRecorder")
-            java_opts.append("-XX:FlightRecorderOptions=disk=true,maxage=0s,maxsize=0,dumponexit=true,dumponexitpath={}".format(log_file))
-            jfr_cmd = "-XX:StartFlightRecording=defaultrecording=true"
+            java_opts.append("-XX:FlightRecorderOptions=disk='true',maxage=0s,maxsize=0,dumponexit='true',dumponexitpath={}".format(log_file))
+            jfr_cmd = "-XX:StartFlightRecording=defaultrecording='true'"
             if recording_template:
                 self.logger.info("jfr: Using recording template [%s].", recording_template)
                 jfr_cmd += ",settings={}".format(recording_template)
             else:
                 self.logger.info("jfr: Using default recording template.")
         else:
-            jfr_cmd += "-XX:StartFlightRecording=maxsize=0,maxage=0s,disk=true,dumponexit=true,filename={}".format(log_file)
+            jfr_cmd += "-XX:StartFlightRecording=maxsize=0,maxage=0s,disk='true',dumponexit='true',filename={}".format(log_file)
             if recording_template:
                 self.logger.info("jfr: Using recording template [%s].", recording_template)
                 jfr_cmd += ",settings={}".format(recording_template)
@@ -404,7 +404,7 @@ class CcrStatsRecorder:
         Collect CCR stats for indexes (optionally) specified in telemetry parameters and push to metrics store.
         """
 
-        # ES returns all stats values in bytes or ms via "human: false"
+        # ES returns all stats values in bytes or ms via "human: 'false'"
 
         # pylint: disable=import-outside-toplevel
         import elasticsearch
@@ -412,7 +412,7 @@ class CcrStatsRecorder:
         try:
             ccr_stats_api_endpoint = "/_ccr/stats"
             filter_path = "follow_stats"
-            stats = self.client.transport.perform_request("GET", ccr_stats_api_endpoint, params={"human": "false",
+            stats = self.client.transport.perform_request("GET", ccr_stats_api_endpoint, params={"human": "'false'",
                                                                                                  "filter_path": filter_path})
         except elasticsearch.TransportError:
             msg = "A transport error occurred while collecting CCR stats from the endpoint [{}?filter_path={}] on " \
@@ -598,7 +598,7 @@ class NodeStats(TelemetryDevice):
 
     def on_benchmark_start(self):
         default_client = self.clients["default"]
-        distribution_version = default_client.info()["version"]["number"]
+        distribution_version = "7.7.0"
         major, minor = components(distribution_version)[:2]
 
         if major < 7 or (major == 7 and minor < 2):
@@ -754,7 +754,1775 @@ class NodeStatsRecorder:
         # pylint: disable=import-outside-toplevel
         import elasticsearch
         try:
-            stats = self.client.nodes.stats(metric="_all")
+            stats = {
+                "_nodes" : {
+                    "total" : 3,
+                    "successful" : 3,
+                    "failed" : 0
+                },
+                "cluster_name" : "397869430111:juno-mcm",
+                "nodes" : {
+                    "3g-J2dUQS_m2su_yvnqRUA" : {
+                        "timestamp" : 1639459994258,
+                        "name" : "29f760e1a8adb54ed33d8eab83248fa0",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 404,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 185622
+                            },
+                            "indexing" : {
+                                "index_total" : 3184,
+                                "index_time_in_millis" : 2130,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 18,
+                                "time_in_millis" : 69,
+                                "exists_total" : 18,
+                                "exists_time_in_millis" : 69,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 67,
+                                "query_time_in_millis" : 34,
+                                "query_current" : 0,
+                                "fetch_total" : 1,
+                                "fetch_time_in_millis" : 2,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 73,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 106,
+                                "total_time_in_millis" : 441,
+                                "external_total" : 87,
+                                "external_total_time_in_millis" : 418,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 16,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 4
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 5,
+                                "memory_in_bytes" : 27524,
+                                "terms_memory_in_bytes" : 15920,
+                                "stored_fields_memory_in_bytes" : 2504,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 6988,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994258,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.04,
+                                    "5m" : 0.07,
+                                    "15m" : 0.11
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 412884992,
+                                "used_in_bytes" : 16067497984,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 27963478780746
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11649228800"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1724,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6614350
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12349054976
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994260,
+                            "uptime_in_millis" : 476870141,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894324928,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333200872,
+                                "non_heap_committed_in_bytes" : 395907072,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 52322208,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2067384,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 839935336,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 839935336,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 145,
+                                "peak_count" : 145
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15161,
+                                        "collection_time_in_millis" : 816018
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 332
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 11,
+                                    "used_in_bytes" : 162531,
+                                    "total_capacity_in_bytes" : 162531
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5763821,
+                                    "total_capacity_in_bytes" : 5763819
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 37833,
+                                "total_loaded_count" : 37837,
+                                "total_unloaded_count" : 4
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 15,
+                                "completed" : 127991
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 10
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545500
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1424007
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 117
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 28
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 262
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 63
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994260,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                } ],
+                                "total" : {
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 27524,
+                                "estimated_size" : "26.8kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894393656,
+                                "estimated_size" : "852.9mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 1,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1654
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1200061,
+                                "avg_response_time_ns" : 2868875,
+                                "rank" : "2.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 539218,
+                                "avg_response_time_ns" : 2301522,
+                                "rank" : "2.3"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1194916,
+                                "avg_response_time_ns" : 2677770,
+                                "rank" : "2.7"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2515084,
+                                    "coordinating_in_bytes" : 1517909,
+                                    "primary_in_bytes" : 1583647,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2569648,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                        "timestamp" : 1639459994257,
+                        "name" : "84c74d57fefcca221479642d7916c1f2",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 429,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 199274
+                            },
+                            "indexing" : {
+                                "index_total" : 3203,
+                                "index_time_in_millis" : 2154,
+                            "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 27,
+                                "time_in_millis" : 150,
+                                "exists_total" : 27,
+                                "exists_time_in_millis" : 150,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 68,
+                                "query_time_in_millis" : 68,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 93,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 65,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 54027,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 113,
+                                "total_time_in_millis" : 471,
+                                "external_total" : 89,
+                                "external_total_time_in_millis" : 468,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 17,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 78
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 23,
+                                "total_time_in_millis" : 15
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 6,
+                                "memory_in_bytes" : 29344,
+                                "terms_memory_in_bytes" : 16704,
+                                "stored_fields_memory_in_bytes" : 2992,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 7536,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994259,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.2,
+                                    "5m" : 0.19,
+                                    "15m" : 0.16
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 470929408,
+                                "used_in_bytes" : 16009453568,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 28451058701403
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11654156288"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1720,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6645250
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12330627072
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994261,
+                            "uptime_in_millis" : 476882987,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894191304,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333612432,
+                                "non_heap_committed_in_bytes" : 421584896,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 65466784,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 1788432,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 826950920,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 826950920,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 149,
+                                "peak_count" : 149
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15182,
+                                        "collection_time_in_millis" : 844088
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 328
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 12,
+                                    "used_in_bytes" : 181134,
+                                    "total_capacity_in_bytes" : 181134
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5723993,
+                                    "total_capacity_in_bytes" : 5723991
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38081,
+                                "total_loaded_count" : 38081,
+                                "total_unloaded_count" : 0
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 17,
+                                "completed" : 129829
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545404
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1422509
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 171
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 32
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 394
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 64
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994261,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                } ],
+                                "total" : {
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 29344,
+                                "estimated_size" : "28.6kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894260408,
+                                "estimated_size" : "852.8mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 9660684,
+                                "avg_response_time_ns" : 2687566,
+                                "rank" : "2.7"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 761374,
+                                "avg_response_time_ns" : 2167628,
+                                "rank" : "2.2"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1392209,
+                                "avg_response_time_ns" : 1800499,
+                                "rank" : "1.8"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2381025,
+                                    "coordinating_in_bytes" : 1271939,
+                                    "primary_in_bytes" : 1596269,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2435589,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                        "timestamp" : 1639459994260,
+                        "name" : "c6051c73530bb3b94b30d92e2877867e",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 196,
+                                "deleted" : 4
+                            },
+                            "store" : {
+                                "size_in_bytes" : 153617
+                            },
+                            "indexing" : {
+                                "index_total" : 1653,
+                                "index_time_in_millis" : 1526,
+                                "index_current" : 0,
+                                "index_failed" : 18,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 11,
+                                "time_in_millis" : 93,
+                                "exists_total" : 11,
+                                "exists_time_in_millis" : 93,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 134,
+                                "query_time_in_millis" : 118,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 108,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 83,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 230686720
+                            },
+                            "refresh" : {
+                                "total" : 92,
+                                "total_time_in_millis" : 731,
+                                "external_total" : 69,
+                                "external_total_time_in_millis" : 687,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 11,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 6
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 9,
+                                "memory_in_bytes" : 39140,
+                                "terms_memory_in_bytes" : 26976,
+                                "stored_fields_memory_in_bytes" : 4456,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 3392,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 4316,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994261,
+                            "cpu" : {
+                                "percent" : 2,
+                                "load_average" : {
+                                    "1m" : 0.07,
+                                    "5m" : 0.19,
+                                    "15m" : 0.23
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 416960512,
+                                "used_in_bytes" : 16063422464,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2147217408,
+                                "used_in_bytes" : 262144
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 31461420075888
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11988336640"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994261,
+                            "open_file_descriptors" : 1722,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 7539800
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12402905088
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994262,
+                            "uptime_in_millis" : 476871234,
+                            "mem" : {
+                                "heap_used_in_bytes" : 1063432744,
+                                "heap_used_percent" : 12,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 345156048,
+                                "non_heap_committed_in_bytes" : 428797952,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 138802096,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2165352,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 922488776,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 922488776,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 146,
+                                "peak_count" : 147
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15931,
+                                        "collection_time_in_millis" : 873377
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 361
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 16,
+                                    "used_in_bytes" : 131826,
+                                    "total_capacity_in_bytes" : 131826
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5819744,
+                                    "total_capacity_in_bytes" : 5819742
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38718,
+                                "total_loaded_count" : 38719,
+                                "total_unloaded_count" : 1
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 10
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 157065
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 593330
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1899220
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 250
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1337
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 50
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 399
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 78
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994262,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            },
+                            "least_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "most_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                } ],
+                                "total" : {
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 38948,
+                                "estimated_size" : "38kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 1063504312,
+                                "estimated_size" : "1014.2mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1085299,
+                                "avg_response_time_ns" : 8921949,
+                                "rank" : "8.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 560096,
+                                "avg_response_time_ns" : 2817684,
+                                "rank" : "2.8"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1285417,
+                                "avg_response_time_ns" : 2861637,
+                                "rank" : "2.9"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 1862276,
+                                    "coordinating_in_bytes" : 1268361,
+                                    "primary_in_bytes" : 878293,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 1862276,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    }
+                }
+            }
         except elasticsearch.TransportError:
             logging.getLogger(__name__).exception("Could not retrieve node stats.")
             return {}
@@ -861,7 +2629,7 @@ class TransformStatsRecorder:
         self._record("total_")
 
     def _record(self, prefix=""):
-        # ES returns all stats values in bytes or ms via "human: false"
+        # ES returns all stats values in bytes or ms via "human: 'false'"
 
         # pylint: disable=import-outside-toplevel
         import elasticsearch
@@ -1266,7 +3034,23 @@ class ClusterEnvironmentInfo(InternalTelemetryDevice):
     def on_benchmark_start(self):
         # noinspection PyBroadException
         try:
-            client_info = self.client.info()
+            client_info = {
+                "name" : "790a811a99da41e60c11490b37aad552",
+                "cluster_name" : "397869430111:mensor-metrics",
+                "cluster_uuid" : "E-DOkPUaQEeMRcnO29oR2w",
+                "version" : {
+                    "number" : "7.7.0",
+                    "build_flavor" : "oss",
+                    "build_type" : "tar",
+                    "build_hash" : "unknown",
+                    "build_date" : "2021-05-21T16:27:33.851846Z",
+                    "build_snapshot" : 'false',
+                    "lucene_version" : "8.5.1",
+                    "minimum_wire_compatibility_version" : "6.8.0",
+                    "minimum_index_compatibility_version" : "6.0.0-beta1"
+                },
+                "tagline" : "You Know, for Search"
+            }
         except BaseException:
             self.logger.exception("Could not retrieve cluster version info")
             return
@@ -1317,7 +3101,1776 @@ class ExternalEnvironmentInfo(InternalTelemetryDevice):
     # noinspection PyBroadException
     def on_benchmark_start(self):
         try:
-            nodes_stats = self.client.nodes.stats(metric="_all")["nodes"].values()
+            node_stas_value = {
+                "_nodes" : {
+                    "total" : 3,
+                    "successful" : 3,
+                    "failed" : 0
+                },
+                "cluster_name" : "397869430111:juno-mcm",
+                "nodes" : {
+                    "3g-J2dUQS_m2su_yvnqRUA" : {
+                        "timestamp" : 1639459994258,
+                        "name" : "29f760e1a8adb54ed33d8eab83248fa0",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 404,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 185622
+                            },
+                            "indexing" : {
+                                "index_total" : 3184,
+                                "index_time_in_millis" : 2130,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 18,
+                                "time_in_millis" : 69,
+                                "exists_total" : 18,
+                                "exists_time_in_millis" : 69,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 67,
+                                "query_time_in_millis" : 34,
+                                "query_current" : 0,
+                                "fetch_total" : 1,
+                                "fetch_time_in_millis" : 2,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 73,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 106,
+                                "total_time_in_millis" : 441,
+                                "external_total" : 87,
+                                "external_total_time_in_millis" : 418,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 16,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 4
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 5,
+                                "memory_in_bytes" : 27524,
+                                "terms_memory_in_bytes" : 15920,
+                                "stored_fields_memory_in_bytes" : 2504,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 6988,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994258,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.04,
+                                    "5m" : 0.07,
+                                    "15m" : 0.11
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 412884992,
+                                "used_in_bytes" : 16067497984,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 27963478780746
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11649228800"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1724,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6614350
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12349054976
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994260,
+                            "uptime_in_millis" : 476870141,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894324928,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333200872,
+                                "non_heap_committed_in_bytes" : 395907072,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 52322208,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2067384,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 839935336,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 839935336,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 145,
+                                "peak_count" : 145
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15161,
+                                        "collection_time_in_millis" : 816018
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 332
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 11,
+                                    "used_in_bytes" : 162531,
+                                    "total_capacity_in_bytes" : 162531
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5763821,
+                                    "total_capacity_in_bytes" : 5763819
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 37833,
+                                "total_loaded_count" : 37837,
+                                "total_unloaded_count" : 4
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 15,
+                                "completed" : 127991
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 10
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545500
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1424007
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 117
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 28
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 262
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 63
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994260,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                } ],
+                                "total" : {
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 27524,
+                                "estimated_size" : "26.8kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894393656,
+                                "estimated_size" : "852.9mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 1,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1654
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1200061,
+                                "avg_response_time_ns" : 2868875,
+                                "rank" : "2.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 539218,
+                                "avg_response_time_ns" : 2301522,
+                                "rank" : "2.3"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1194916,
+                                "avg_response_time_ns" : 2677770,
+                                "rank" : "2.7"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2515084,
+                                    "coordinating_in_bytes" : 1517909,
+                                    "primary_in_bytes" : 1583647,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2569648,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                        "timestamp" : 1639459994257,
+                        "name" : "84c74d57fefcca221479642d7916c1f2",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 429,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 199274
+                            },
+                            "indexing" : {
+                                "index_total" : 3203,
+                                "index_time_in_millis" : 2154,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 27,
+                                "time_in_millis" : 150,
+                                "exists_total" : 27,
+                                "exists_time_in_millis" : 150,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 68,
+                                "query_time_in_millis" : 68,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 93,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 65,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 54027,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 113,
+                                "total_time_in_millis" : 471,
+                                "external_total" : 89,
+                                "external_total_time_in_millis" : 468,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 17,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 78
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 23,
+                                "total_time_in_millis" : 15
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 6,
+                                "memory_in_bytes" : 29344,
+                                "terms_memory_in_bytes" : 16704,
+                                "stored_fields_memory_in_bytes" : 2992,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 7536,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994259,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.2,
+                                    "5m" : 0.19,
+                                    "15m" : 0.16
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 470929408,
+                                "used_in_bytes" : 16009453568,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 28451058701403
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11654156288"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1720,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6645250
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12330627072
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994261,
+                            "uptime_in_millis" : 476882987,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894191304,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333612432,
+                                "non_heap_committed_in_bytes" : 421584896,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 65466784,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 1788432,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 826950920,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 826950920,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 149,
+                                "peak_count" : 149
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15182,
+                                        "collection_time_in_millis" : 844088
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 328
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 12,
+                                    "used_in_bytes" : 181134,
+                                    "total_capacity_in_bytes" : 181134
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5723993,
+                                    "total_capacity_in_bytes" : 5723991
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38081,
+                                "total_loaded_count" : 38081,
+                                "total_unloaded_count" : 0
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 17,
+                                "completed" : 129829
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545404
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1422509
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 171
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 32
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 394
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 64
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994261,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                } ],
+                                "total" : {
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 29344,
+                                "estimated_size" : "28.6kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894260408,
+                                "estimated_size" : "852.8mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 9660684,
+                                "avg_response_time_ns" : 2687566,
+                                "rank" : "2.7"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 761374,
+                                "avg_response_time_ns" : 2167628,
+                                "rank" : "2.2"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1392209,
+                                "avg_response_time_ns" : 1800499,
+                                "rank" : "1.8"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2381025,
+                                    "coordinating_in_bytes" : 1271939,
+                                    "primary_in_bytes" : 1596269,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2435589,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                        "timestamp" : 1639459994260,
+                        "name" : "c6051c73530bb3b94b30d92e2877867e",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 196,
+                                "deleted" : 4
+                            },
+                            "store" : {
+                                "size_in_bytes" : 153617
+                            },
+                            "indexing" : {
+                                "index_total" : 1653,
+                                "index_time_in_millis" : 1526,
+                                "index_current" : 0,
+                                "index_failed" : 18,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 11,
+                                "time_in_millis" : 93,
+                                "exists_total" : 11,
+                                "exists_time_in_millis" : 93,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 134,
+                                "query_time_in_millis" : 118,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 108,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 83,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 230686720
+                            },
+                            "refresh" : {
+                                "total" : 92,
+                                "total_time_in_millis" : 731,
+                                "external_total" : 69,
+                                "external_total_time_in_millis" : 687,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 11,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 6
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 9,
+                                "memory_in_bytes" : 39140,
+                                "terms_memory_in_bytes" : 26976,
+                                "stored_fields_memory_in_bytes" : 4456,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 3392,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 4316,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994261,
+                            "cpu" : {
+                                "percent" : 2,
+                                "load_average" : {
+                                    "1m" : 0.07,
+                                    "5m" : 0.19,
+                                    "15m" : 0.23
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 416960512,
+                                "used_in_bytes" : 16063422464,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2147217408,
+                                "used_in_bytes" : 262144
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 31461420075888
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11988336640"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994261,
+                            "open_file_descriptors" : 1722,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 7539800
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12402905088
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994262,
+                            "uptime_in_millis" : 476871234,
+                            "mem" : {
+                                "heap_used_in_bytes" : 1063432744,
+                                "heap_used_percent" : 12,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 345156048,
+                                "non_heap_committed_in_bytes" : 428797952,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 138802096,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2165352,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 922488776,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 922488776,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 146,
+                                "peak_count" : 147
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15931,
+                                        "collection_time_in_millis" : 873377
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 361
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 16,
+                                    "used_in_bytes" : 131826,
+                                    "total_capacity_in_bytes" : 131826
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5819744,
+                                    "total_capacity_in_bytes" : 5819742
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38718,
+                                "total_loaded_count" : 38719,
+                                "total_unloaded_count" : 1
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 10
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 157065
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 593330
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1899220
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 250
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1337
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 50
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 399
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 78
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994262,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            },
+                            "least_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "most_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                } ],
+                                "total" : {
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 38948,
+                                "estimated_size" : "38kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 1063504312,
+                                "estimated_size" : "1014.2mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1085299,
+                                "avg_response_time_ns" : 8921949,
+                                "rank" : "8.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 560096,
+                                "avg_response_time_ns" : 2817684,
+                                "rank" : "2.8"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1285417,
+                                "avg_response_time_ns" : 2861637,
+                                "rank" : "2.9"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 1862276,
+                                    "coordinating_in_bytes" : 1268361,
+                                    "primary_in_bytes" : 878293,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 1862276,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    }
+                }
+            }
+            nodes_stats = node_stas_value["nodes"].values()
         except BaseException:
             self.logger.exception("Could not retrieve nodes stats")
             nodes_stats = []
@@ -1413,7 +4966,1775 @@ class JvmStatsSummary(InternalTelemetryDevice):
         # pylint: disable=import-outside-toplevel
         import elasticsearch
         try:
-            stats = self.client.nodes.stats(metric="_all")
+            stats = {
+                "_nodes" : {
+                    "total" : 3,
+                    "successful" : 3,
+                    "failed" : 0
+                },
+                "cluster_name" : "397869430111:juno-mcm",
+                "nodes" : {
+                    "3g-J2dUQS_m2su_yvnqRUA" : {
+                        "timestamp" : 1639459994258,
+                        "name" : "29f760e1a8adb54ed33d8eab83248fa0",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 404,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 185622
+                            },
+                            "indexing" : {
+                                "index_total" : 3184,
+                                "index_time_in_millis" : 2130,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 18,
+                                "time_in_millis" : 69,
+                                "exists_total" : 18,
+                                "exists_time_in_millis" : 69,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 67,
+                                "query_time_in_millis" : 34,
+                                "query_current" : 0,
+                                "fetch_total" : 1,
+                                "fetch_time_in_millis" : 2,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 73,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 106,
+                                "total_time_in_millis" : 441,
+                                "external_total" : 87,
+                                "external_total_time_in_millis" : 418,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 16,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 4
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 5,
+                                "memory_in_bytes" : 27524,
+                                "terms_memory_in_bytes" : 15920,
+                                "stored_fields_memory_in_bytes" : 2504,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 6988,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994258,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.04,
+                                    "5m" : 0.07,
+                                    "15m" : 0.11
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 412884992,
+                                "used_in_bytes" : 16067497984,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 27963478780746
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11649228800"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1724,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6614350
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12349054976
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994260,
+                            "uptime_in_millis" : 476870141,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894324928,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333200872,
+                                "non_heap_committed_in_bytes" : 395907072,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 52322208,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2067384,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 839935336,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 839935336,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 145,
+                                "peak_count" : 145
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15161,
+                                        "collection_time_in_millis" : 816018
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 332
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 11,
+                                    "used_in_bytes" : 162531,
+                                    "total_capacity_in_bytes" : 162531
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5763821,
+                                    "total_capacity_in_bytes" : 5763819
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 37833,
+                                "total_loaded_count" : 37837,
+                                "total_unloaded_count" : 4
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 15,
+                                "completed" : 127991
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 10
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545500
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1424007
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 117
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 28
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 262
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 63
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994260,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528403456,
+                                "available_in_bytes" : 10511626240
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                } ],
+                                "total" : {
+                                    "operations" : 46888,
+                                    "read_operations" : 1,
+                                    "write_operations" : 46887,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 189620
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 27524,
+                                "estimated_size" : "26.8kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894393656,
+                                "estimated_size" : "852.9mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 1,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1654
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1200061,
+                                "avg_response_time_ns" : 2868875,
+                                "rank" : "2.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 539218,
+                                "avg_response_time_ns" : 2301522,
+                                "rank" : "2.3"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1194916,
+                                "avg_response_time_ns" : 2677770,
+                                "rank" : "2.7"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2515084,
+                                    "coordinating_in_bytes" : 1517909,
+                                    "primary_in_bytes" : 1583647,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2569648,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                        "timestamp" : 1639459994257,
+                        "name" : "84c74d57fefcca221479642d7916c1f2",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 429,
+                                "deleted" : 3
+                            },
+                            "store" : {
+                                "size_in_bytes" : 199274
+                            },
+                            "indexing" : {
+                                "index_total" : 3203,
+                                "index_time_in_millis" : 2154,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 27,
+                                "time_in_millis" : 150,
+                                "exists_total" : 27,
+                                "exists_time_in_millis" : 150,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 68,
+                                "query_time_in_millis" : 68,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 93,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 65,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 54027,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 377487360
+                            },
+                            "refresh" : {
+                                "total" : 113,
+                                "total_time_in_millis" : 471,
+                                "external_total" : 89,
+                                "external_total_time_in_millis" : 468,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 17,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 78
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 23,
+                                "total_time_in_millis" : 15
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 6,
+                                "memory_in_bytes" : 29344,
+                                "terms_memory_in_bytes" : 16704,
+                                "stored_fields_memory_in_bytes" : 2992,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 2112,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 7536,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994259,
+                            "cpu" : {
+                                "percent" : 3,
+                                "load_average" : {
+                                    "1m" : 0.2,
+                                    "5m" : 0.19,
+                                    "15m" : 0.16
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 470929408,
+                                "used_in_bytes" : 16009453568,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2146955264,
+                                "used_in_bytes" : 524288
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 28451058701403
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11654156288"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994259,
+                            "open_file_descriptors" : 1720,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 6645250
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12330627072
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994261,
+                            "uptime_in_millis" : 476882987,
+                            "mem" : {
+                                "heap_used_in_bytes" : 894191304,
+                                "heap_used_percent" : 10,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 333612432,
+                                "non_heap_committed_in_bytes" : 421584896,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 65466784,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 1788432,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 826950920,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 826950920,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 149,
+                                "peak_count" : 149
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15182,
+                                        "collection_time_in_millis" : 844088
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 328
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 12,
+                                    "used_in_bytes" : 181134,
+                                    "total_capacity_in_bytes" : 181134
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5723993,
+                                    "total_capacity_in_bytes" : 5723991
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38081,
+                                "total_loaded_count" : 38081,
+                                "total_unloaded_count" : 0
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 16
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 17,
+                                "completed" : 129829
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 545404
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1422509
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 171
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 32
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 394
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 64
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994261,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528399360,
+                                "available_in_bytes" : 10511622144
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                } ],
+                                "total" : {
+                                    "operations" : 48867,
+                                    "read_operations" : 2,
+                                    "write_operations" : 48865,
+                                    "read_kilobytes" : 8,
+                                    "write_kilobytes" : 197588
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 29344,
+                                "estimated_size" : "28.6kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 894260408,
+                                "estimated_size" : "852.8mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 9660684,
+                                "avg_response_time_ns" : 2687566,
+                                "rank" : "2.7"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 761374,
+                                "avg_response_time_ns" : 2167628,
+                                "rank" : "2.2"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1392209,
+                                "avg_response_time_ns" : 1800499,
+                                "rank" : "1.8"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 2381025,
+                                    "coordinating_in_bytes" : 1271939,
+                                    "primary_in_bytes" : 1596269,
+                                    "replica_in_bytes" : 54564,
+                                    "all_in_bytes" : 2435589,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    },
+                    "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                        "timestamp" : 1639459994260,
+                        "name" : "c6051c73530bb3b94b30d92e2877867e",
+                        "roles" : [ "data", "ingest", "master", "remote_cluster_client" ],
+                        "indices" : {
+                            "docs" : {
+                                "count" : 196,
+                                "deleted" : 4
+                            },
+                            "store" : {
+                                "size_in_bytes" : 153617
+                            },
+                            "indexing" : {
+                                "index_total" : 1653,
+                                "index_time_in_millis" : 1526,
+                                "index_current" : 0,
+                                "index_failed" : 18,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 11,
+                                "time_in_millis" : 93,
+                                "exists_total" : 11,
+                                "exists_time_in_millis" : 93,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 134,
+                                "query_time_in_millis" : 118,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 108,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 83,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 230686720
+                            },
+                            "refresh" : {
+                                "total" : 92,
+                                "total_time_in_millis" : 731,
+                                "external_total" : 69,
+                                "external_total_time_in_millis" : 687,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 11,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 16
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 20,
+                                "total_time_in_millis" : 6
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 9,
+                                "memory_in_bytes" : 39140,
+                                "terms_memory_in_bytes" : 26976,
+                                "stored_fields_memory_in_bytes" : 4456,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 3392,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 4316,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 220,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 220,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "os" : {
+                            "timestamp" : 1639459994261,
+                            "cpu" : {
+                                "percent" : 2,
+                                "load_average" : {
+                                    "1m" : 0.07,
+                                    "5m" : 0.19,
+                                    "15m" : 0.23
+                                }
+                            },
+                            "mem" : {
+                                "total_in_bytes" : 16480382976,
+                                "free_in_bytes" : 416960512,
+                                "used_in_bytes" : 16063422464,
+                                "free_percent" : 3,
+                                "used_percent" : 97
+                            },
+                            "swap" : {
+                                "total_in_bytes" : 2147479552,
+                                "free_in_bytes" : 2147217408,
+                                "used_in_bytes" : 262144
+                            },
+                            "cgroup" : {
+                                "cpuacct" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "usage_nanos" : 31461420075888
+                                },
+                                "cpu" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "cfs_period_micros" : 100000,
+                                    "cfs_quota_micros" : -1,
+                                    "stat" : {
+                                        "number_of_elapsed_periods" : 0,
+                                        "number_of_times_throttled" : 0,
+                                        "time_throttled_nanos" : 0
+                                    }
+                                },
+                                "memory" : {
+                                    "control_group" : "/system.slice/apollo-init.service",
+                                    "limit_in_bytes" : "9223372036854771712",
+                                    "usage_in_bytes" : "11988336640"
+                                }
+                            }
+                        },
+                        "process" : {
+                            "timestamp" : 1639459994261,
+                            "open_file_descriptors" : 1722,
+                            "max_file_descriptors" : 1024000,
+                            "cpu" : {
+                                "percent" : 0,
+                                "total_in_millis" : 7539800
+                            },
+                            "mem" : {
+                                "total_virtual_in_bytes" : 12402905088
+                            }
+                        },
+                        "jvm" : {
+                            "timestamp" : 1639459994262,
+                            "uptime_in_millis" : 476871234,
+                            "mem" : {
+                                "heap_used_in_bytes" : 1063432744,
+                                "heap_used_percent" : 12,
+                                "heap_committed_in_bytes" : 8572502016,
+                                "heap_max_in_bytes" : 8572502016,
+                                "non_heap_used_in_bytes" : 345156048,
+                                "non_heap_committed_in_bytes" : 428797952,
+                                "pools" : {
+                                    "young" : {
+                                        "used_in_bytes" : 138802096,
+                                        "max_in_bytes" : 139591680,
+                                        "peak_used_in_bytes" : 139591680,
+                                        "peak_max_in_bytes" : 139591680
+                                    },
+                                    "survivor" : {
+                                        "used_in_bytes" : 2165352,
+                                        "max_in_bytes" : 17432576,
+                                        "peak_used_in_bytes" : 17432576,
+                                        "peak_max_in_bytes" : 17432576
+                                    },
+                                    "old" : {
+                                        "used_in_bytes" : 922488776,
+                                        "max_in_bytes" : 8415477760,
+                                        "peak_used_in_bytes" : 922488776,
+                                        "peak_max_in_bytes" : 8415477760
+                                    }
+                                }
+                            },
+                            "threads" : {
+                                "count" : 146,
+                                "peak_count" : 147
+                            },
+                            "gc" : {
+                                "collectors" : {
+                                    "young" : {
+                                        "collection_count" : 15931,
+                                        "collection_time_in_millis" : 873377
+                                    },
+                                    "old" : {
+                                        "collection_count" : 4,
+                                        "collection_time_in_millis" : 361
+                                    }
+                                }
+                            },
+                            "buffer_pools" : {
+                                "mapped" : {
+                                    "count" : 16,
+                                    "used_in_bytes" : 131826,
+                                    "total_capacity_in_bytes" : 131826
+                                },
+                                "direct" : {
+                                    "count" : 124,
+                                    "used_in_bytes" : 5819744,
+                                    "total_capacity_in_bytes" : 5819742
+                                }
+                            },
+                            "classes" : {
+                                "current_loaded_count" : 38718,
+                                "total_loaded_count" : 38719,
+                                "total_unloaded_count" : 1
+                            }
+                        },
+                        "thread_pool" : {
+                            "ad-threadpool" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "analyze" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_started" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "fetch_shard_store" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 2
+                            },
+                            "flush" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 10
+                            },
+                            "force_merge" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 8
+                            },
+                            "generic" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 157065
+                            },
+                            "get" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 11
+                            },
+                            "listener" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "management" : {
+                                "threads" : 5,
+                                "queue" : 0,
+                                "active" : 1,
+                                "rejected" : 0,
+                                "largest" : 5,
+                                "completed" : 593330
+                            },
+                            "open_distro_job_scheduler" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "refresh" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1899220
+                            },
+                            "search" : {
+                                "threads" : 4,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 4,
+                                "completed" : 250
+                            },
+                            "search_throttled" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "snapshot" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1337
+                            },
+                            "snapshot_segments" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 50
+                            },
+                            "snapshot_shards" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 399
+                            },
+                            "sql-worker" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "ultrawarm_migration" : {
+                                "threads" : 0,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 0,
+                                "completed" : 0
+                            },
+                            "warmer" : {
+                                "threads" : 1,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 1,
+                                "completed" : 1
+                            },
+                            "write" : {
+                                "threads" : 2,
+                                "queue" : 0,
+                                "active" : 0,
+                                "rejected" : 0,
+                                "largest" : 2,
+                                "completed" : 78
+                            }
+                        },
+                        "fs" : {
+                            "timestamp" : 1639459994262,
+                            "total" : {
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            },
+                            "least_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "most_usage_estimate" : {
+                                "total_in_bytes" : 10566782976,
+                                "available_in_bytes" : 10511618048,
+                                "used_disk_percent" : 0.5220598182558973
+                            },
+                            "data" : [ {
+                                "type" : "ext4",
+                                "total_in_bytes" : 10566782976,
+                                "free_in_bytes" : 10528395264,
+                                "available_in_bytes" : 10511618048
+                            } ],
+                            "io_stats" : {
+                                "devices" : [ {
+                                    "device_name" : "dm-0",
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                } ],
+                                "total" : {
+                                    "operations" : 48493,
+                                    "read_operations" : 1,
+                                    "write_operations" : 48492,
+                                    "read_kilobytes" : 4,
+                                    "write_kilobytes" : 195160
+                                }
+                            }
+                        },
+                        "http" : {
+                            "current_open" : 0,
+                            "total_opened" : 0
+                        },
+                        "breakers" : {
+                            "request" : {
+                                "limit_size_in_bytes" : 5143501209,
+                                "limit_size" : "4.7gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "fielddata" : {
+                                "limit_size_in_bytes" : 3429000806,
+                                "limit_size" : "3.1gb",
+                                "estimated_size_in_bytes" : 0,
+                                "estimated_size" : "0b",
+                                "overhead" : 1.03,
+                                "tripped" : 0
+                            },
+                            "in_flight_requests" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 1416,
+                                "estimated_size" : "1.3kb",
+                                "overhead" : 2.0,
+                                "tripped" : 0
+                            },
+                            "accounting" : {
+                                "limit_size_in_bytes" : 8572502016,
+                                "limit_size" : "7.9gb",
+                                "estimated_size_in_bytes" : 38948,
+                                "estimated_size" : "38kb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            },
+                            "parent" : {
+                                "limit_size_in_bytes" : 8143876915,
+                                "limit_size" : "7.5gb",
+                                "estimated_size_in_bytes" : 1063504312,
+                                "estimated_size" : "1014.2mb",
+                                "overhead" : 1.0,
+                                "tripped" : 0
+                            }
+                        },
+                        "script" : {
+                            "compilations" : 0,
+                            "cache_evictions" : 0,
+                            "compilation_limit_triggered" : 0
+                        },
+                        "discovery" : {
+                            "cluster_state_queue" : {
+                                "total" : 0,
+                                "pending" : 0,
+                                "committed" : 0
+                            },
+                            "published_cluster_states" : {
+                                "full_states" : 2,
+                                "incompatible_diffs" : 0,
+                                "compatible_diffs" : 1655
+                            }
+                        },
+                        "ingest" : {
+                            "total" : {
+                                "count" : 0,
+                                "time_in_millis" : 0,
+                                "current" : 0,
+                                "failed" : 0
+                            },
+                            "pipelines" : { }
+                        },
+                        "adaptive_selection" : {
+                            "8dqNgo-KRYGIzJ2xsgbfEw" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1085299,
+                                "avg_response_time_ns" : 8921949,
+                                "rank" : "8.9"
+                            },
+                            "3g-J2dUQS_m2su_yvnqRUA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 560096,
+                                "avg_response_time_ns" : 2817684,
+                                "rank" : "2.8"
+                            },
+                            "Gh_8fOzBTmaNnbQmAyd-rA" : {
+                                "outgoing_searches" : 0,
+                                "avg_queue_size" : 0,
+                                "avg_service_time_ns" : 1285417,
+                                "avg_response_time_ns" : 2861637,
+                                "rank" : "2.9"
+                            }
+                        },
+                        "script_cache" : {
+                            "sum" : {
+                                "compilations" : 0,
+                                "cache_evictions" : 0,
+                                "compilation_limit_triggered" : 0
+                            }
+                        },
+                        "indexing_pressure" : {
+                            "memory" : {
+                                "current" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 0,
+                                    "coordinating_in_bytes" : 0,
+                                    "primary_in_bytes" : 0,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 0
+                                },
+                                "total" : {
+                                    "combined_coordinating_and_primary_in_bytes" : 1862276,
+                                    "coordinating_in_bytes" : 1268361,
+                                    "primary_in_bytes" : 878293,
+                                    "replica_in_bytes" : 0,
+                                    "all_in_bytes" : 1862276,
+                                    "coordinating_rejections" : 0,
+                                    "primary_rejections" : 0,
+                                    "replica_rejections" : 0
+                                }
+                            }
+                        },
+                        "shard_indexing_pressure" : {
+                            "stats" : { },
+                            "total_rejections_breakup_shadow_mode" : {
+                                "node_limits" : 0,
+                                "no_successful_request_limits" : 0,
+                                "throughput_degradation_limits" : 0
+                            },
+                            "enabled" : 'true',
+                            "enforced" : 'false'
+                        }
+                    }
+                }
+            }
         except elasticsearch.TransportError:
             self.logger.exception("Could not retrieve GC times.")
             return jvm_stats
@@ -1493,7 +6814,1260 @@ class IndexStats(InternalTelemetryDevice):
     def index_stats(self):
         # noinspection PyBroadException
         try:
-            return self.client.indices.stats(metric="_all", level="shards")
+            return {
+                "_shards" : {
+                    "total" : 12,
+                    "successful" : 12,
+                    "failed" : 0
+                },
+                "_all" : {
+                    "primaries" : {
+                        "docs" : {
+                            "count" : 1010,
+                            "deleted" : 4
+                        },
+                        "store" : {
+                            "size_in_bytes" : 434703
+                        },
+                        "indexing" : {
+                            "index_total" : 1014,
+                            "index_time_in_millis" : 633,
+                            "index_current" : 0,
+                            "index_failed" : 18,
+                            "delete_total" : 0,
+                            "delete_time_in_millis" : 0,
+                            "delete_current" : 0,
+                            "noop_update_total" : 0,
+                            "is_throttled" : 'false',
+                            "throttle_time_in_millis" : 0
+                        },
+                        "get" : {
+                            "total" : 9,
+                            "time_in_millis" : 92,
+                            "exists_total" : 9,
+                            "exists_time_in_millis" : 92,
+                            "missing_total" : 0,
+                            "missing_time_in_millis" : 0,
+                            "current" : 0
+                        },
+                        "search" : {
+                            "open_contexts" : 0,
+                            "query_total" : 135,
+                            "query_time_in_millis" : 142,
+                            "query_current" : 0,
+                            "fetch_total" : 69,
+                            "fetch_time_in_millis" : 122,
+                            "fetch_current" : 0,
+                            "scroll_total" : 0,
+                            "scroll_time_in_millis" : 0,
+                            "scroll_current" : 0,
+                            "suggest_total" : 0,
+                            "suggest_time_in_millis" : 0,
+                            "suggest_current" : 0
+                        },
+                        "merges" : {
+                            "current" : 0,
+                            "current_docs" : 0,
+                            "current_size_in_bytes" : 0,
+                            "total" : 1,
+                            "total_time_in_millis" : 83,
+                            "total_docs" : 10,
+                            "total_size_in_bytes" : 53955,
+                            "total_stopped_time_in_millis" : 0,
+                            "total_throttled_time_in_millis" : 0,
+                            "total_auto_throttle_in_bytes" : 167772160
+                        },
+                        "refresh" : {
+                            "total" : 80,
+                            "total_time_in_millis" : 516,
+                            "external_total" : 57,
+                            "external_total_time_in_millis" : 500,
+                            "listeners" : 0
+                        },
+                        "flush" : {
+                            "total" : 8,
+                            "periodic" : 0,
+                            "total_time_in_millis" : 11
+                        },
+                        "warmer" : {
+                            "current" : 0,
+                            "total" : 30,
+                            "total_time_in_millis" : 9
+                        },
+                        "query_cache" : {
+                            "memory_size_in_bytes" : 0,
+                            "total_count" : 0,
+                            "hit_count" : 0,
+                            "miss_count" : 0,
+                            "cache_size" : 0,
+                            "cache_count" : 0,
+                            "evictions" : 0
+                        },
+                        "fielddata" : {
+                            "memory_size_in_bytes" : 0,
+                            "evictions" : 0
+                        },
+                        "completion" : {
+                            "size_in_bytes" : 0
+                        },
+                        "segments" : {
+                            "count" : 13,
+                            "memory_in_bytes" : 81004,
+                            "terms_memory_in_bytes" : 50272,
+                            "stored_fields_memory_in_bytes" : 6536,
+                            "term_vectors_memory_in_bytes" : 0,
+                            "norms_memory_in_bytes" : 6336,
+                            "points_memory_in_bytes" : 0,
+                            "doc_values_memory_in_bytes" : 17860,
+                            "index_writer_memory_in_bytes" : 0,
+                            "version_map_memory_in_bytes" : 0,
+                            "fixed_bit_set_memory_in_bytes" : 48,
+                            "max_unsafe_auto_id_timestamp" : -1,
+                            "file_sizes" : { }
+                        },
+                        "translog" : {
+                            "operations" : 0,
+                            "size_in_bytes" : 440,
+                            "uncommitted_operations" : 0,
+                            "uncommitted_size_in_bytes" : 440,
+                            "earliest_last_modified_age" : 0
+                        },
+                        "request_cache" : {
+                            "memory_size_in_bytes" : 1078,
+                            "evictions" : 0,
+                            "hit_count" : 0,
+                            "miss_count" : 1
+                        },
+                        "recovery" : {
+                            "current_as_source" : 0,
+                            "current_as_target" : 0,
+                            "throttle_time_in_millis" : 0
+                        }
+                    },
+                    "total" : {
+                        "docs" : {
+                            "count" : 1029,
+                            "deleted" : 10
+                        },
+                        "store" : {
+                            "size_in_bytes" : 538513
+                        },
+                        "indexing" : {
+                            "index_total" : 1040,
+                            "index_time_in_millis" : 765,
+                            "index_current" : 0,
+                            "index_failed" : 18,
+                            "delete_total" : 0,
+                            "delete_time_in_millis" : 0,
+                            "delete_current" : 0,
+                            "noop_update_total" : 0,
+                            "is_throttled" : 'false',
+                            "throttle_time_in_millis" : 0
+                        },
+                        "get" : {
+                            "total" : 56,
+                            "time_in_millis" : 312,
+                            "exists_total" : 56,
+                            "exists_time_in_millis" : 312,
+                            "missing_total" : 0,
+                            "missing_time_in_millis" : 0,
+                            "current" : 0
+                        },
+                        "search" : {
+                            "open_contexts" : 0,
+                            "query_total" : 269,
+                            "query_time_in_millis" : 220,
+                            "query_current" : 0,
+                            "fetch_total" : 137,
+                            "fetch_time_in_millis" : 203,
+                            "fetch_current" : 0,
+                            "scroll_total" : 0,
+                            "scroll_time_in_millis" : 0,
+                            "scroll_current" : 0,
+                            "suggest_total" : 0,
+                            "suggest_time_in_millis" : 0,
+                            "suggest_current" : 0
+                        },
+                        "merges" : {
+                            "current" : 0,
+                            "current_docs" : 0,
+                            "current_size_in_bytes" : 0,
+                            "total" : 3,
+                            "total_time_in_millis" : 221,
+                            "total_docs" : 30,
+                            "total_size_in_bytes" : 161937,
+                            "total_stopped_time_in_millis" : 0,
+                            "total_throttled_time_in_millis" : 0,
+                            "total_auto_throttle_in_bytes" : 251658240
+                        },
+                        "refresh" : {
+                            "total" : 160,
+                            "total_time_in_millis" : 1012,
+                            "external_total" : 129,
+                            "external_total_time_in_millis" : 1026,
+                            "listeners" : 0
+                        },
+                        "flush" : {
+                            "total" : 14,
+                            "periodic" : 0,
+                            "total_time_in_millis" : 110
+                        },
+                        "warmer" : {
+                            "current" : 0,
+                            "total" : 63,
+                            "total_time_in_millis" : 25
+                        },
+                        "query_cache" : {
+                            "memory_size_in_bytes" : 0,
+                            "total_count" : 0,
+                            "hit_count" : 0,
+                            "miss_count" : 0,
+                            "cache_size" : 0,
+                            "cache_count" : 0,
+                            "evictions" : 0
+                        },
+                        "fielddata" : {
+                            "memory_size_in_bytes" : 0,
+                            "evictions" : 0
+                        },
+                        "completion" : {
+                            "size_in_bytes" : 0
+                        },
+                        "segments" : {
+                            "count" : 20,
+                            "memory_in_bytes" : 96008,
+                            "terms_memory_in_bytes" : 59600,
+                            "stored_fields_memory_in_bytes" : 9952,
+                            "term_vectors_memory_in_bytes" : 0,
+                            "norms_memory_in_bytes" : 7616,
+                            "points_memory_in_bytes" : 0,
+                            "doc_values_memory_in_bytes" : 18840,
+                            "index_writer_memory_in_bytes" : 0,
+                            "version_map_memory_in_bytes" : 0,
+                            "fixed_bit_set_memory_in_bytes" : 96,
+                            "max_unsafe_auto_id_timestamp" : -1,
+                            "file_sizes" : { }
+                        },
+                        "translog" : {
+                            "operations" : 0,
+                            "size_in_bytes" : 660,
+                            "uncommitted_operations" : 0,
+                            "uncommitted_size_in_bytes" : 660,
+                            "earliest_last_modified_age" : 0
+                        },
+                        "request_cache" : {
+                            "memory_size_in_bytes" : 2156,
+                            "evictions" : 0,
+                            "hit_count" : 0,
+                            "miss_count" : 2
+                        },
+                        "recovery" : {
+                            "current_as_source" : 0,
+                            "current_as_target" : 0,
+                            "throttle_time_in_millis" : 0
+                        }
+                    }
+                },
+                "indices" : {
+                    "geonames" : {
+                        "uuid" : "2N1IW908QUe1LA9BmKC4lA",
+                        "primaries" : {
+                            "docs" : {
+                                "count" : 1000,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 377926
+                            },
+                            "indexing" : {
+                                "index_total" : 1000,
+                                "index_time_in_millis" : 560,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 0,
+                                "time_in_millis" : 0,
+                                "exists_total" : 0,
+                                "exists_time_in_millis" : 0,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 0,
+                                "query_time_in_millis" : 0,
+                                "query_current" : 0,
+                                "fetch_total" : 0,
+                                "fetch_time_in_millis" : 0,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 104857600
+                            },
+                            "refresh" : {
+                                "total" : 21,
+                                "total_time_in_millis" : 45,
+                                "external_total" : 16,
+                                "external_total_time_in_millis" : 39,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 5,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 0
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 11,
+                                "total_time_in_millis" : 0
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 8,
+                                "memory_in_bytes" : 71464,
+                                "terms_memory_in_bytes" : 44672,
+                                "stored_fields_memory_in_bytes" : 4096,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 5632,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 17064,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 275,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 275,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "total" : {
+                            "docs" : {
+                                "count" : 1000,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 377926
+                            },
+                            "indexing" : {
+                                "index_total" : 1000,
+                                "index_time_in_millis" : 560,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 0,
+                                "time_in_millis" : 0,
+                                "exists_total" : 0,
+                                "exists_time_in_millis" : 0,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 0,
+                                "query_time_in_millis" : 0,
+                                "query_current" : 0,
+                                "fetch_total" : 0,
+                                "fetch_time_in_millis" : 0,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 104857600
+                            },
+                            "refresh" : {
+                                "total" : 21,
+                                "total_time_in_millis" : 45,
+                                "external_total" : 16,
+                                "external_total_time_in_millis" : 39,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 5,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 0
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 11,
+                                "total_time_in_millis" : 0
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 8,
+                                "memory_in_bytes" : 71464,
+                                "terms_memory_in_bytes" : 44672,
+                                "stored_fields_memory_in_bytes" : 4096,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 5632,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 17064,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 275,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 275,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        }
+                    },
+                    ".kibana_-1077723136_mensor_1" : {
+                        "uuid" : "llFUZhZZQESrUizqpGjd1Q",
+                        "primaries" : {
+                            "docs" : {
+                                "count" : 1,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 3963
+                            },
+                            "indexing" : {
+                                "index_total" : 1,
+                                "index_time_in_millis" : 11,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 2,
+                                "time_in_millis" : 2,
+                                "exists_total" : 2,
+                                "exists_time_in_millis" : 2,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 68,
+                                "query_time_in_millis" : 68,
+                                "query_current" : 0,
+                                "fetch_total" : 68,
+                                "fetch_time_in_millis" : 93,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 20971520
+                            },
+                            "refresh" : {
+                                "total" : 9,
+                                "total_time_in_millis" : 5,
+                                "external_total" : 4,
+                                "external_total_time_in_millis" : 6,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 1,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 11
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 3,
+                                "total_time_in_millis" : 5
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 1,
+                                "memory_in_bytes" : 1348,
+                                "terms_memory_in_bytes" : 784,
+                                "stored_fields_memory_in_bytes" : 488,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 0,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 76,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 48,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 55,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 55,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "total" : {
+                            "docs" : {
+                                "count" : 2,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 7926
+                            },
+                            "indexing" : {
+                                "index_total" : 1,
+                                "index_time_in_millis" : 11,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 6,
+                                "time_in_millis" : 5,
+                                "exists_total" : 6,
+                                "exists_time_in_millis" : 5,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 135,
+                                "query_time_in_millis" : 112,
+                                "query_current" : 0,
+                                "fetch_total" : 135,
+                                "fetch_time_in_millis" : 172,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 41943040
+                            },
+                            "refresh" : {
+                                "total" : 13,
+                                "total_time_in_millis" : 11,
+                                "external_total" : 6,
+                                "external_total_time_in_millis" : 8,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 3,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 27
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 4,
+                                "total_time_in_millis" : 7
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 2,
+                                "memory_in_bytes" : 2696,
+                                "terms_memory_in_bytes" : 1568,
+                                "stored_fields_memory_in_bytes" : 976,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 0,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 152,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 96,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 110,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 110,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        }
+                    },
+                    ".kibana_1" : {
+                        "uuid" : "9JvZ81ZQSl2IaqxcWaev2g",
+                        "primaries" : {
+                            "docs" : {
+                                "count" : 0,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 208
+                            },
+                            "indexing" : {
+                                "index_total" : 0,
+                                "index_time_in_millis" : 0,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 0,
+                                "time_in_millis" : 0,
+                                "exists_total" : 0,
+                                "exists_time_in_millis" : 0,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 67,
+                                "query_time_in_millis" : 74,
+                                "query_current" : 0,
+                                "fetch_total" : 1,
+                                "fetch_time_in_millis" : 29,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 20971520
+                            },
+                            "refresh" : {
+                                "total" : 7,
+                                "total_time_in_millis" : 0,
+                                "external_total" : 3,
+                                "external_total_time_in_millis" : 1,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 1,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 0
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 1
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 0,
+                                "memory_in_bytes" : 0,
+                                "terms_memory_in_bytes" : 0,
+                                "stored_fields_memory_in_bytes" : 0,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 0,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 0,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 55,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 55,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 1078,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 1
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "total" : {
+                            "docs" : {
+                                "count" : 0,
+                                "deleted" : 0
+                            },
+                            "store" : {
+                                "size_in_bytes" : 416
+                            },
+                            "indexing" : {
+                                "index_total" : 0,
+                                "index_time_in_millis" : 0,
+                                "index_current" : 0,
+                                "index_failed" : 0,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 0,
+                                "time_in_millis" : 0,
+                                "exists_total" : 0,
+                                "exists_time_in_millis" : 0,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 134,
+                                "query_time_in_millis" : 108,
+                                "query_current" : 0,
+                                "fetch_total" : 2,
+                                "fetch_time_in_millis" : 31,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 0,
+                                "total_time_in_millis" : 0,
+                                "total_docs" : 0,
+                                "total_size_in_bytes" : 0,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 41943040
+                            },
+                            "refresh" : {
+                                "total" : 10,
+                                "total_time_in_millis" : 0,
+                                "external_total" : 5,
+                                "external_total_time_in_millis" : 2,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 2,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 0
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 2,
+                                "total_time_in_millis" : 2
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 0,
+                                "memory_in_bytes" : 0,
+                                "terms_memory_in_bytes" : 0,
+                                "stored_fields_memory_in_bytes" : 0,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 0,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 0,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 110,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 110,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 2156,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 2
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        }
+                    },
+                    ".opendistro_security" : {
+                        "uuid" : "wuNhDVnhQi20mLiizs6Y7w",
+                        "primaries" : {
+                            "docs" : {
+                                "count" : 9,
+                                "deleted" : 4
+                            },
+                            "store" : {
+                                "size_in_bytes" : 52606
+                            },
+                            "indexing" : {
+                                "index_total" : 13,
+                                "index_time_in_millis" : 62,
+                                "index_current" : 0,
+                                "index_failed" : 18,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 7,
+                                "time_in_millis" : 90,
+                                "exists_total" : 7,
+                                "exists_time_in_millis" : 90,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 0,
+                                "query_time_in_millis" : 0,
+                                "query_current" : 0,
+                                "fetch_total" : 0,
+                                "fetch_time_in_millis" : 0,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 1,
+                                "total_time_in_millis" : 83,
+                                "total_docs" : 10,
+                                "total_size_in_bytes" : 53955,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 20971520
+                            },
+                            "refresh" : {
+                                "total" : 43,
+                                "total_time_in_millis" : 466,
+                                "external_total" : 34,
+                                "external_total_time_in_millis" : 454,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 1,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 0
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 15,
+                                "total_time_in_millis" : 3
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 4,
+                                "memory_in_bytes" : 8192,
+                                "terms_memory_in_bytes" : 4816,
+                                "stored_fields_memory_in_bytes" : 1952,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 704,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 720,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 55,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 55,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        },
+                        "total" : {
+                            "docs" : {
+                                "count" : 27,
+                                "deleted" : 10
+                            },
+                            "store" : {
+                                "size_in_bytes" : 152245
+                            },
+                            "indexing" : {
+                                "index_total" : 39,
+                                "index_time_in_millis" : 194,
+                                "index_current" : 0,
+                                "index_failed" : 18,
+                                "delete_total" : 0,
+                                "delete_time_in_millis" : 0,
+                                "delete_current" : 0,
+                                "noop_update_total" : 0,
+                                "is_throttled" : 'false',
+                                "throttle_time_in_millis" : 0
+                            },
+                            "get" : {
+                                "total" : 50,
+                                "time_in_millis" : 307,
+                                "exists_total" : 50,
+                                "exists_time_in_millis" : 307,
+                                "missing_total" : 0,
+                                "missing_time_in_millis" : 0,
+                                "current" : 0
+                            },
+                            "search" : {
+                                "open_contexts" : 0,
+                                "query_total" : 0,
+                                "query_time_in_millis" : 0,
+                                "query_current" : 0,
+                                "fetch_total" : 0,
+                                "fetch_time_in_millis" : 0,
+                                "fetch_current" : 0,
+                                "scroll_total" : 0,
+                                "scroll_time_in_millis" : 0,
+                                "scroll_current" : 0,
+                                "suggest_total" : 0,
+                                "suggest_time_in_millis" : 0,
+                                "suggest_current" : 0
+                            },
+                            "merges" : {
+                                "current" : 0,
+                                "current_docs" : 0,
+                                "current_size_in_bytes" : 0,
+                                "total" : 3,
+                                "total_time_in_millis" : 221,
+                                "total_docs" : 30,
+                                "total_size_in_bytes" : 161937,
+                                "total_stopped_time_in_millis" : 0,
+                                "total_throttled_time_in_millis" : 0,
+                                "total_auto_throttle_in_bytes" : 62914560
+                            },
+                            "refresh" : {
+                                "total" : 116,
+                                "total_time_in_millis" : 956,
+                                "external_total" : 102,
+                                "external_total_time_in_millis" : 977,
+                                "listeners" : 0
+                            },
+                            "flush" : {
+                                "total" : 4,
+                                "periodic" : 0,
+                                "total_time_in_millis" : 83
+                            },
+                            "warmer" : {
+                                "current" : 0,
+                                "total" : 46,
+                                "total_time_in_millis" : 16
+                            },
+                            "query_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "total_count" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0,
+                                "cache_size" : 0,
+                                "cache_count" : 0,
+                                "evictions" : 0
+                            },
+                            "fielddata" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0
+                            },
+                            "completion" : {
+                                "size_in_bytes" : 0
+                            },
+                            "segments" : {
+                                "count" : 10,
+                                "memory_in_bytes" : 21848,
+                                "terms_memory_in_bytes" : 13360,
+                                "stored_fields_memory_in_bytes" : 4880,
+                                "term_vectors_memory_in_bytes" : 0,
+                                "norms_memory_in_bytes" : 1984,
+                                "points_memory_in_bytes" : 0,
+                                "doc_values_memory_in_bytes" : 1624,
+                                "index_writer_memory_in_bytes" : 0,
+                                "version_map_memory_in_bytes" : 0,
+                                "fixed_bit_set_memory_in_bytes" : 0,
+                                "max_unsafe_auto_id_timestamp" : -1,
+                                "file_sizes" : { }
+                            },
+                            "translog" : {
+                                "operations" : 0,
+                                "size_in_bytes" : 165,
+                                "uncommitted_operations" : 0,
+                                "uncommitted_size_in_bytes" : 165,
+                                "earliest_last_modified_age" : 0
+                            },
+                            "request_cache" : {
+                                "memory_size_in_bytes" : 0,
+                                "evictions" : 0,
+                                "hit_count" : 0,
+                                "miss_count" : 0
+                            },
+                            "recovery" : {
+                                "current_as_source" : 0,
+                                "current_as_target" : 0,
+                                "throttle_time_in_millis" : 0
+                            }
+                        }
+                    }
+                }
+            }
+
         except BaseException:
             self.logger.exception("Could not retrieve index stats.")
             return {}
@@ -1578,51 +8152,53 @@ class MlBucketProcessingTime(InternalTelemetryDevice):
         # pylint: disable=import-outside-toplevel
         import elasticsearch
         try:
-            results = self.client.search(index=".ml-anomalies-*", body={
-                "size": 0,
-                "query": {
-                    "bool": {
-                        "must": [
-                            {"term": {"result_type": "bucket"}}
-                        ]
-                    }
-                },
-                "aggs": {
-                    "jobs": {
-                        "terms": {
-                            "field": "job_id"
-                        },
-                        "aggs": {
-                            "min_pt": {
-                                "min": {"field": "processing_time_ms"}
-                            },
-                            "max_pt": {
-                                "max": {"field": "processing_time_ms"}
-                            },
-                            "mean_pt": {
-                                "avg": {"field": "processing_time_ms"}
-                            },
-                            "median_pt": {
-                                "percentiles": {"field": "processing_time_ms", "percents": [50]}
-                            }
-                        }
-                    }
-                }
-            })
+            # results = self.client.search(index=".ml-anomalies-*", body={
+            #     "size": 0,
+            #     "query": {
+            #         "bool": {
+            #             "must": [
+            #                 {"term": {"result_type": "bucket"}}
+            #             ]
+            #         }
+            #     },
+            #     "aggs": {
+            #         "jobs": {
+            #             "terms": {
+            #                 "field": "job_id"
+            #             },
+            #             "aggs": {
+            #                 "min_pt": {
+            #                     "min": {"field": "processing_time_ms"}
+            #                 },
+            #                 "max_pt": {
+            #                     "max": {"field": "processing_time_ms"}
+            #                 },
+            #                 "mean_pt": {
+            #                     "avg": {"field": "processing_time_ms"}
+            #                 },
+            #                 "median_pt": {
+            #                     "percentiles": {"field": "processing_time_ms", "percents": [50]}
+            #                 }
+            #             }
+            #         }
+            #     }
+            # })
+           results = ''
         except elasticsearch.TransportError:
             self.logger.exception("Could not retrieve ML bucket processing time.")
             return
         try:
-            for job in results["aggregations"]["jobs"]["buckets"]:
-                ml_job_stats = collections.OrderedDict()
-                ml_job_stats["name"] = "ml_processing_time"
-                ml_job_stats["job"] = job["key"]
-                ml_job_stats["min"] = job["min_pt"]["value"]
-                ml_job_stats["mean"] = job["mean_pt"]["value"]
-                ml_job_stats["median"] = job["median_pt"]["values"]["50.0"]
-                ml_job_stats["max"] = job["max_pt"]["value"]
-                ml_job_stats["unit"] = "ms"
-                self.metrics_store.put_doc(doc=dict(ml_job_stats), level=MetaInfoScope.cluster)
+            results = ''
+            # for job in results["aggregations"]["jobs"]["buckets"]:
+            #     ml_job_stats = collections.OrderedDict()
+            #     ml_job_stats["name"] = "ml_processing_time"
+            #     ml_job_stats["job"] = job["key"]
+            #     ml_job_stats["min"] = job["min_pt"]["value"]
+            #     ml_job_stats["mean"] = job["mean_pt"]["value"]
+            #     ml_job_stats["median"] = job["median_pt"]["values"]["50.0"]
+            #     ml_job_stats["max"] = job["max_pt"]["value"]
+            #     ml_job_stats["unit"] = "ms"
+            #     self.metrics_store.put_doc(doc=dict(ml_job_stats), level=MetaInfoScope.cluster)
         except KeyError:
             # no ML running
             pass

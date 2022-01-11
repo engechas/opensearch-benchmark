@@ -468,6 +468,7 @@ class BulkIndex(Runner):
         * ``request-timeout``: a non-negative float indicating the client-side timeout for the operation.  If not present, defaults to
          ``None`` and potentially falls back to the global timeout setting.
         """
+        print(">>>>>>> Executing bulk!!!!!!!!")
         detailed_results = params.get("detailed-results", False)
         api_kwargs = self._default_kw_params(params)
 

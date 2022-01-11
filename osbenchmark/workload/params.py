@@ -1102,6 +1102,8 @@ class IndexDataReader:
     """
 
     def __init__(self, data_file, batch_size, bulk_size, file_source, index_name, type_name):
+        print(">>>>>>>>>>>>>> data file is >>>")
+        print(data_file)
         self.data_file = data_file
         self.batch_size = batch_size
         self.bulk_size = bulk_size

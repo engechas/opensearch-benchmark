@@ -5,6 +5,7 @@ import subprocess
 from osbenchmark import time, telemetry
 from osbenchmark.builder import java_resolver, cluster
 from osbenchmark.builder.launchers.launcher import Launcher
+from osbenchmark.builder.models.providers import Provider
 from osbenchmark.exceptions import LaunchError, ExecutorError
 from osbenchmark.utils import opts, io
 
@@ -40,19 +41,20 @@ class ProcessLauncher(Launcher):
 
         enabled_devices = self.pci.variables["telemetry"]["devices"]
         telemetry_params = self.pci.variables["telemetry"]["params"]
-        # TODO non-stats telemetry devices? Easy solution is don't support on external hosts. Otherwise need a shell_executor
-        # TODO doesn't seem MVP to support these telem devices on external hosts
-        # TODO could just branch on self.pci.provider == Provider.LOCAL
-        
-        node_telemetry = [
-            telemetry.FlightRecorder(telemetry_params, node_telemetry_dir, java_major_version),
-            telemetry.JitCompiler(node_telemetry_dir),
-            telemetry.Gc(telemetry_params, node_telemetry_dir, java_major_version),
-            telemetry.Heapdump(node_telemetry_dir),
-            telemetry.DiskIo(node_count_on_host),
-            telemetry.IndexSize(data_paths),
-            telemetry.StartupTime(),
-        ]
+
+        # TODO support non-stats telemetry devices on non-local clusters
+        if self.pci.provider == Provider.LOCAL:
+            node_telemetry = [
+                telemetry.FlightRecorder(telemetry_params, node_telemetry_dir, java_major_version),
+                telemetry.JitCompiler(node_telemetry_dir),
+                telemetry.Gc(telemetry_params, node_telemetry_dir, java_major_version),
+                telemetry.Heapdump(node_telemetry_dir),
+                telemetry.DiskIo(node_count_on_host),
+                telemetry.IndexSize(data_paths),
+                telemetry.StartupTime(),
+            ]
+        else:
+            node_telemetry = []
 
         t = telemetry.Telemetry(enabled_devices, devices=node_telemetry)
         env = self._prepare_env(host, node_name, java_home, t)

@@ -35,12 +35,13 @@ def run_subprocess(command_line):
     return os.system(command_line)
 
 
-def run_subprocess_with_output(command_line):
+def run_subprocess_with_output(command_line, shell=False):
     logger = logging.getLogger(__name__)
     logger.debug("Running subprocess [%s] with output.", command_line)
-    command_line_args = shlex.split(command_line)
 
-    with subprocess.Popen(command_line_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as command_line_process:
+    command_line_args = shlex.split(command_line) if not shell else command_line
+
+    with subprocess.Popen(command_line_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell) as command_line_process:
         has_output = True
         lines = []
         while has_output:
@@ -69,7 +70,7 @@ def exit_status_as_bool(runnable, quiet=False):
 
 
 def run_subprocess_with_logging(command_line, header=None, level=logging.INFO, stdin=None, stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT, env=None, detach=False):
+                                stderr=subprocess.STDOUT, env=None, detach=False, shell=False):
     """
     Runs the provided command line in a subprocess. All output will be captured by a logger.
 
@@ -84,11 +85,12 @@ def run_subprocess_with_logging(command_line, header=None, level=logging.INFO, s
       will be returned as a stream.
     :param env: Use specific environment variables (default: None).
     :param detach: Whether to detach this process from its parent process (default: False).
+    ;param shell: A boolean denoting if the command should be run as a shell command
     :return: The process exit code as an int.
     """
     logger = logging.getLogger(__name__)
     logger.debug("Running subprocess [%s] with logging.", command_line)
-    command_line_args = shlex.split(command_line)
+    command_line_args = shlex.split(command_line) if not shell else command_line
     pre_exec = os.setpgrp if detach else None
     if header is not None:
         logger.info(header)
@@ -100,7 +102,8 @@ def run_subprocess_with_logging(command_line, header=None, level=logging.INFO, s
                           universal_newlines=True,
                           env=env,
                           stdin=stdin if stdin else None,
-                          preexec_fn=pre_exec) as command_line_process:
+                          preexec_fn=pre_exec,
+                          shell=shell) as command_line_process:
         stdout, _ = command_line_process.communicate()
         if stdout:
             logger.log(level=level, msg=stdout)

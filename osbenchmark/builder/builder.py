@@ -614,7 +614,8 @@ def load_provision_config(cfg, external):
         provision_config_instance = provision_config.load_provision_config_instance(
             provision_config_path,
             cfg.opts("builder", "provision_config_instance.names"),
-            cfg.opts("builder", "provision_config_instance.params"))
+            cfg.opts("builder", "provision_config_instance.params"),
+            cfg=cfg)
         plugins = provision_config.load_plugins(provision_config_path,
                                     cfg.opts("builder", "provision_config_instance.plugins", mandatory=False),
                                     cfg.opts("builder", "plugin.params", mandatory=False))

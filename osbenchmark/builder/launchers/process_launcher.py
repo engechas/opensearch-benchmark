@@ -2,9 +2,7 @@ import logging
 import os
 import subprocess
 
-import psutil
-
-from osbenchmark import time, telemetry, exceptions
+from osbenchmark import time, telemetry
 from osbenchmark.builder import java_resolver, cluster
 from osbenchmark.builder.launchers.launcher import Launcher
 from osbenchmark.exceptions import LaunchError, ExecutorError
@@ -19,7 +17,6 @@ class ProcessLauncher(Launcher):
         self.logger = logging.getLogger(__name__)
         self.pci = pci
         self._clock = clock
-        # Need a get or default method in PCI. Or not? Should be defined in default PCI. Could be conflicts
         self.pass_env_vars = opts.csv_to_list(self.pci.variables["system"]["env"]["passenv"])
 
     def start(self, host, node_configurations):
@@ -41,10 +38,12 @@ class ProcessLauncher(Launcher):
 
         self.logger.info("Starting node [%s].", node_name)
 
-        # Need a way to get these into the PCI, set in configure_telemetry_params benchmark.py from CLI args
-        enabled_devices = self.pci.opts("telemetry", "devices")
-        telemetry_params = self.pci.opts("telemetry", "params")
-        # How to install telemetry devices on external node?
+        enabled_devices = self.pci.variables["telemetry"]["devices"]
+        telemetry_params = self.pci.variables["telemetry"]["params"]
+        # TODO non-stats telemetry devices? Easy solution is don't support on external hosts. Otherwise need a shell_executor
+        # TODO doesn't seem MVP to support these telem devices on external hosts
+        # TODO could just branch on self.pci.provider == Provider.LOCAL
+        
         node_telemetry = [
             telemetry.FlightRecorder(telemetry_params, node_telemetry_dir, java_major_version),
             telemetry.JitCompiler(node_telemetry_dir),
@@ -56,7 +55,7 @@ class ProcessLauncher(Launcher):
         ]
 
         t = telemetry.Telemetry(enabled_devices, devices=node_telemetry)
-        env = self._prepare_env(node_name, java_home, t)
+        env = self._prepare_env(host, node_name, java_home, t)
         t.on_pre_node_start(node_name)
         node_pid = self._start_process(host, binary_path, env)
         self.logger.info("Successfully started node [%s] with PID [%s].", node_name, node_pid)
@@ -67,10 +66,10 @@ class ProcessLauncher(Launcher):
 
         return node
 
-    def _prepare_env(self, node_name, java_home, t):
-        env = {k: v for k, v in os.environ.items() if k in self.pass_env_vars}
+    def _prepare_env(self, host, node_name, java_home, t):
+        env = self._get_env(host)
         if java_home:
-            self._set_env(env, "PATH", os.path.join(java_home, "bin"), separator=os.pathsep, prepend=True)
+            self._set_env(env, "PATH", os.path.join(java_home, "bin"), separator=":", prepend=True)
             # This property is the higher priority starting in ES 7.12.0, and is the only supported java home in >=8.0
             env["OPENSEARCH_JAVA_HOME"] = java_home
             # TODO remove this when ES <8.0 becomes unsupported by Benchmark
@@ -86,6 +85,13 @@ class ProcessLauncher(Launcher):
         self.logger.debug("env for [%s]: %s", node_name, str(env))
         return env
 
+    def _get_env(self, host):
+        env_vars = self.shell_executor.execute(host, "printenv", output=True)
+        env_vars_as_dict = dict(env_var.split("=") for env_var in env_vars)
+
+        pass_env_keys = set(self.pass_env_vars).intersection(set(env_vars_as_dict.keys()))
+        return {key: env_vars_as_dict[key] for key in pass_env_keys}
+
     def _set_env(self, env, k, v, separator=' ', prepend=False):
         if v is not None:
             if k not in env:
@@ -96,35 +102,30 @@ class ProcessLauncher(Launcher):
                 env[k] = env[k] + separator + v
 
     def _start_process(self, host, binary_path, env):
-        if os.name == "posix" and os.geteuid() == 0:
+        if int(self.shell_executor.execute(host, "echo $EUID")[0]) == 0:
             raise LaunchError("Cannot launch OpenSearch as root. Please run Benchmark as a non-root user.")
-        os.chdir(binary_path)
-        cmd = [io.escape_path(os.path.join(".", "bin", "opensearch"))]
+
+        cmd = [io.escape_path(os.path.join(binary_path, "bin", "opensearch"))]
         cmd.extend(["-d", "-p", "pid"])
         try:
-            self.executor.execute(host, command_line=" ".join(cmd), env=env,
-                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, detach=True)
+            self.shell_executor.execute(host, " ".join(cmd), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, detach=True)
         except ExecutorError as e:
             raise LaunchError("Exception starting OpenSearch", e)
 
-        return self._wait_for_pidfile(io.escape_path(os.path.join(".", "pid")))
+        return self._wait_for_pidfile(host, io.escape_path(os.path.join(binary_path, "pid")))
 
-    def _wait_for_pidfile(self, pidfilename):
+    def _wait_for_pidfile(self, host, pidfilename):
         stop_watch = self._clock.stop_watch()
         stop_watch.start()
         while stop_watch.split_time() < self.PROCESS_WAIT_TIMEOUT_SECONDS:
             try:
-                with open(pidfilename, "rb") as f:
-                    buf = f.read()
-                    if not buf:
-                        raise EOFError
-                    return int(buf)
-            except (FileNotFoundError, EOFError):
+                return int(self.shell_executor.execute(host, "cat " + pidfilename, output=True)[0])
+            except (ExecutorError, IndexError):
                 time.sleep(0.5)
 
         msg = "pid file not available after {} seconds!".format(self.PROCESS_WAIT_TIMEOUT_SECONDS)
         self.logger.error(msg)
-        raise exceptions.LaunchError(msg)
+        raise LaunchError(msg)
 
     def stop(self, host, nodes, metrics_store):
         self.logger.info("Shutting down [%d] nodes on this host.", len(nodes))
@@ -133,34 +134,53 @@ class ProcessLauncher(Launcher):
             node_name = node.node_name
             if metrics_store:
                 telemetry.add_metadata_for_node(metrics_store, node_name, node.host_name)
-            try:
-                opensearch = psutil.Process(pid=node.pid)
-                node.telemetry.detach_from_node(node, running=True)
-            except psutil.NoSuchProcess:
-                self.logger.warning("No process found with PID [%s] for node [%s].", node.pid, node_name)
-                opensearch = None
 
-            if opensearch:
+            if self._is_process_running(host, node.pid):
+                node.telemetry.detach_from_node(node, running=True)
+
                 stop_watch = self._clock.stop_watch()
                 stop_watch.start()
-                try:
-                    opensearch.terminate()
-                    opensearch.wait(10.0)
-                    stopped_nodes.append(node)
-                except psutil.NoSuchProcess:
-                    self.logger.warning("No process found with PID [%s] for node [%s].", opensearch.pid, node_name)
-                except psutil.TimeoutExpired:
-                    self.logger.info("kill -KILL node [%s]", node_name)
-                    try:
-                        # kill -9
-                        opensearch.kill()
+
+                # SIGTERM to kill gracefully
+                if self._terminate_process(host, node.pid):
+                    time.sleep(10)
+
+                    if self._is_process_running(host, node.pid):
+                        # SIGKILL to force kill
+                        if self._kill_process(host, node.pid):
+                            stopped_nodes.append(node)
+                    else:
                         stopped_nodes.append(node)
-                    except psutil.NoSuchProcess:
-                        self.logger.warning("No process found with PID [%s] for node [%s].", opensearch.pid, node_name)
+
                 self.logger.info("Done shutting down node [%s] in [%.1f] s.", node_name, stop_watch.split_time())
 
                 node.telemetry.detach_from_node(node, running=False)
+
             # store system metrics in any case (telemetry devices may derive system metrics while the node is running)
             if metrics_store:
                 node.telemetry.store_system_metrics(node, metrics_store)
         return stopped_nodes
+
+    def _is_process_running(self, host, pid):
+        try:
+            self.shell_executor.execute(host, "ps aux | awk '$2 == " + str(pid) + "'", output=True, shell=True)[0]
+            return True
+        except IndexError:
+            self.logger.warning("No process found with PID [%s] on host [%s].", pid, host)
+            return False
+
+    def _terminate_process(self, host, pid):
+        try:
+            self.shell_executor.execute(host, "kill " + str(pid))
+            return True
+        except ExecutorError:
+            self.logger.warning("No process found with PID [%s] on host [%s].", pid, host)
+            return False
+
+    def _kill_process(self, host, pid):
+        try:
+            self.shell_executor.execute(host, "kill -9 " + str(pid))
+            return True
+        except ExecutorError:
+            self.logger.warning("No process found with PID [%s] on host [%s].", pid, host)
+            return False

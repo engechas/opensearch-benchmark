@@ -5,20 +5,24 @@ import subprocess
 from osbenchmark import time, telemetry
 from osbenchmark.builder import java_resolver, cluster
 from osbenchmark.builder.launchers.launcher import Launcher
-from osbenchmark.builder.models.providers import Provider
+
+from osbenchmark.builder.models.cluster_infra_providers import ClusterInfraProvider
 from osbenchmark.exceptions import LaunchError, ExecutorError
 from osbenchmark.utils import opts, io
+from osbenchmark.utils.periodic_waiter import PeriodicWaiter
 
 
 class ProcessLauncher(Launcher):
     PROCESS_WAIT_TIMEOUT_SECONDS = 90.0
+    PROCESS_WAIT_INTERVAL_SECONDS = 0.5
 
-    def __init__(self, pci, executor, clock=time.Clock):
+    def __init__(self, pci, executor, metrics_store, clock=time.Clock):
         super().__init__(executor)
         self.logger = logging.getLogger(__name__)
         self.pci = pci
-        self._clock = clock
-        self.pass_env_vars = opts.csv_to_list(self.pci.variables["system"]["env"]["passenv"])
+        self.metrics_store = metrics_store
+        self.waiter = PeriodicWaiter(ProcessLauncher.PROCESS_WAIT_INTERVAL_SECONDS,
+                                     ProcessLauncher.PROCESS_WAIT_TIMEOUT_SECONDS, clock=clock)
 
     def start(self, host, node_configurations):
         node_count_on_host = len(node_configurations)
@@ -43,7 +47,7 @@ class ProcessLauncher(Launcher):
         telemetry_params = self.pci.variables["telemetry"]["params"]
 
         # TODO support non-stats telemetry devices on non-local clusters
-        if self.pci.provider == Provider.LOCAL:
+        if self.pci.provider == ClusterInfraProvider.LOCAL:
             node_telemetry = [
                 telemetry.FlightRecorder(telemetry_params, node_telemetry_dir, java_major_version),
                 telemetry.JitCompiler(node_telemetry_dir),
@@ -91,8 +95,9 @@ class ProcessLauncher(Launcher):
         env_vars = self.shell_executor.execute(host, "printenv", output=True)
         env_vars_as_dict = dict(env_var.split("=") for env_var in env_vars)
 
-        pass_env_keys = set(self.pass_env_vars).intersection(set(env_vars_as_dict.keys()))
-        return {key: env_vars_as_dict[key] for key in pass_env_keys}
+        pass_env_keys = opts.csv_to_list(self.pci.variables["system"]["env"]["passenv"])
+        pass_env_keys_intersection = set(pass_env_keys).intersection(set(env_vars_as_dict.keys()))
+        return {key: env_vars_as_dict[key] for key in pass_env_keys_intersection}
 
     def _set_env(self, env, k, v, separator=' ', prepend=False):
         if v is not None:
@@ -114,34 +119,35 @@ class ProcessLauncher(Launcher):
         except ExecutorError as e:
             raise LaunchError("Exception starting OpenSearch", e)
 
-        return self._wait_for_pidfile(host, io.escape_path(os.path.join(binary_path, "pid")))
+        pid_file_name = io.escape_path(os.path.join(binary_path, "pid"))
+        self._wait_for_pidfile(host, pid_file_name)
 
-    def _wait_for_pidfile(self, host, pidfilename):
-        stop_watch = self._clock.stop_watch()
-        stop_watch.start()
-        while stop_watch.split_time() < self.PROCESS_WAIT_TIMEOUT_SECONDS:
-            try:
-                return int(self.shell_executor.execute(host, "cat " + pidfilename, output=True)[0])
-            except (ExecutorError, IndexError):
-                time.sleep(0.5)
+        return int(self._get_pid_file(host, pid_file_name)[0])
 
-        msg = "pid file not available after {} seconds!".format(self.PROCESS_WAIT_TIMEOUT_SECONDS)
-        self.logger.error(msg)
-        raise LaunchError(msg)
+    def _wait_for_pidfile(self, host, pid_file_name):
+        self.waiter.wait(self._is_pid_file_available, host, pid_file_name)
 
-    def stop(self, host, nodes, metrics_store):
+    def _is_pid_file_available(self, host, pid_file_name):
+        try:
+            pid_file = self._get_pid_file(host, pid_file_name)
+            return len(pid_file) > 0
+        except ExecutorError:
+            self.logger.info("PID file %s does not yet exist on host %s", pid_file_name, host)
+            return False
+
+    def _get_pid_file(self, host, pid_file_name):
+        return self.shell_executor.execute(host, "cat " + pid_file_name, output=True)
+
+    def stop(self, host, nodes):
         self.logger.info("Shutting down [%d] nodes on this host.", len(nodes))
         stopped_nodes = []
         for node in nodes:
             node_name = node.node_name
-            if metrics_store:
-                telemetry.add_metadata_for_node(metrics_store, node_name, node.host_name)
+            if self.metrics_store:
+                telemetry.add_metadata_for_node(self.metrics_store, node_name, node.host_name)
 
             if self._is_process_running(host, node.pid):
                 node.telemetry.detach_from_node(node, running=True)
-
-                stop_watch = self._clock.stop_watch()
-                stop_watch.start()
 
                 # SIGTERM to kill gracefully
                 if self._terminate_process(host, node.pid):
@@ -154,20 +160,20 @@ class ProcessLauncher(Launcher):
                     else:
                         stopped_nodes.append(node)
 
-                self.logger.info("Done shutting down node [%s] in [%.1f] s.", node_name, stop_watch.split_time())
+                self.logger.info("Done shutting down node [%s].", node_name)
 
                 node.telemetry.detach_from_node(node, running=False)
 
             # store system metrics in any case (telemetry devices may derive system metrics while the node is running)
-            if metrics_store:
-                node.telemetry.store_system_metrics(node, metrics_store)
+            if self.metrics_store:
+                node.telemetry.store_system_metrics(node, self.metrics_store)
         return stopped_nodes
 
     def _is_process_running(self, host, pid):
-        try:
-            self.shell_executor.execute(host, "ps aux | awk '$2 == " + str(pid) + "'", output=True, shell=True)[0]
+        process_lines = self.shell_executor.execute(host, "ps aux | awk '$2 == " + str(pid) + "'", output=True, shell=True)
+        if len(process_lines) > 0:
             return True
-        except IndexError:
+        else:
             self.logger.warning("No process found with PID [%s] on host [%s].", pid, host)
             return False
 
